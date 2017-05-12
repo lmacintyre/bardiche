@@ -10,6 +10,8 @@
 
 <div id="container" style="width: 512px; height: 512px; margin-left: auto; margin-right: auto; border: thick solid #ac3232;"></div>
 
+	<script src="keyboard.js"></script>
+	<script src="collision.js"></script>
 	<script type="text/javascript">
 
 		//Aliases
@@ -20,13 +22,6 @@
 			Sprite = PIXI.Sprite,
 			Text = PIXI.Text;
 
-		//Control enums
-		let controlEnum = {
-			CONTROL_MODE_FREE: 1,
-			CONTROL_MODE_AIR: 2,
-			CONTROL_MODE_ATK: 3
-		};
-
 		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 		let stage = new Container(),
@@ -34,50 +29,12 @@
 		renderer.backgroundColor = 0x639BFF;
 		document.getElementById("container").appendChild(renderer.view);
 		
-		loader.add("tiledata.json")
-			.add("playerdata.json")
-			.add("dummydata.json")
+		loader.add("res/tiledata.json")
+			.add("res/playerdata.json")
+			.add("res/dummydata.json")
 			.load(setup);
 
 		let state = play;
-
-
-		function keyboard(keyCode) {
-			let key = {};
-			key.code = keyCode;
-			key.isDown = false;
-			key.isUp = true;
-			key.press = undefined;
-			key.release = undefined;
-
-			key.downHandler = function(event) {
-				if (event.keyCode === key.code) {
-					if (key.isUp && key.press) key.press();
-					key.isDown = true;
-					key.isUp = false;
-				}
-				event.preventDefault();
-			};
-
-			key.upHandler = function(event) {
-				if (event.keyCode === key.code) {
-					if (key.isDown && key.release) key.release();
-					key.isUp = true;
-					key.isDown = false;
-				}
-				event.preventDefault();
-			};
-
-			window.addEventListener(
-				"keydown", key.downHandler.bind(key), false
-			);
-
-			window.addEventListener(
-				"keyup", key.upHandler.bind(key), false
-			);
-
-			return key;
-		}
 
 		let tileSrc, tiles, tileGroup;
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
@@ -86,11 +43,9 @@
 		let dummyIdleFrames, dummyHitFrames;
 
 		function setup() {
-
-
-			let tileTextures = PIXI.loader.resources["tiledata.json"].textures;
-			let playerTextures = PIXI.loader.resources["playerdata.json"].textures;
-			let dummyTextures = PIXI.loader.resources["dummydata.json"].textures;
+			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
+			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
+			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
 
 			let tileEnum = {
 				FIL_AIR: 0,
@@ -230,7 +185,6 @@
 			playerSprite = new PIXI.extras.AnimatedSprite(playerWalkFrames);
 			playerSprite.position.set(192, 100);
 			playerSprite.grounded = false;
-			playerSprite.controlMode = controlEnum.CONTROL_MODE_FREE;
 			playerSprite.centerX = playerSprite.x;
 			playerSprite.centerY = playerSprite.y + playerSprite.height / 2;
 			playerSprite.vx = 0;
@@ -342,7 +296,6 @@
 					playerSprite.weaponbox = 0;
 				}
 			}
-
 		}
 
 		function setPlayerAnimation(frames, loop=true) {
@@ -354,22 +307,48 @@
 			playerSprite.loop = loop;
 		}
 
-		/*
-		  rectangleCollision
-		  ------------------
+		function moveActor(A, collision) {
 
-		  Use it to prevent two rectangular sprites from overlapping.
-		  Optionally, make the first rectangle bounce off the second rectangle.
-		  Parameters:
-		  a. A sprite object with `x`, `y` `centerX`, `centerY`, `halfWidth` and `halfHeight` properties.
-		  b. A sprite object with `x`, `y` `centerX`, `centerY`, `halfWidth` and `halfHeight` properties.
-		  c. Optional: true or false to indicate whether or not the first sprite
-		  should bounce off the second sprite.
-		  */
+			console.log("side: " + collision.side + ", overlap: " + collision.overlap);
 
-		function rectangleCollision(r1, r2, fix=true) {
+			if (collision.side == "top") {
+				A.y = A.y + collision.overlap;
+				A.centerY = A.centerY + collision.overlap;
 
-		    let collision, combinedHalfWidths, combinedHalfHeights, overlapX, overlapY, vx, vy;
+				if (A.hitbox) {
+					A.hitbox.y = A.hitbox.y + collision.overlap;
+					A.hitbox.centerY = A.hitbox.centerY + collision.overlap;
+				}
+			} else if (collision.side == "bottom") {
+				A.y = A.y - collision.overlap;
+				A.centerY = A.centerY - collision.overlap;
+
+				if (A.hitbox) {
+					A.hitbox.y = A.hitbox.y - collision.overlap;
+					A.hitbox.centerY = A.hitbox.centerY - collision.overlap;
+				}
+			} else if (collision.side == "left") {
+				A.x = A.x + collision.overlap;
+				A.centerX = A.centerX + collision.overlap;
+
+				if (A.hitbox) {
+					A.hitbox.X = A.hitbox.X + collision.overlap;
+					A.hitbox.centerX = A.hitbox.centerX + collision.overlap;
+				}
+			} else if (collision.side == "right") {
+				A.x = A.x - collision.overlap;
+				A.centerX = A.centerX - collision.overlap;
+
+				if (A.hitbox) {
+					A.hitbox.x = A.hitbox.x - collision.overlap;
+					A.hitbox.centerX = A.hitbox.centerX - collision.overlap;
+				}
+			} 
+		}
+
+		function rectangleCollision(r1, r2) {
+
+		    let side, overlap, combinedHalfWidths, combinedHalfHeights, overlapX, overlapY, vx, vy;
 
 		    vx = r1.centerX - r2.centerX;
 		    vy = r1.centerY - r2.centerY;
@@ -387,31 +366,19 @@
 			        if (overlapX >= overlapY) {
 
 			        	if (vy > 0) {
-			        		collision = "top";
-			        		if (fix) {
-			        			r1.y = r1.y + overlapY;
-			        			r1.centerY = r1.centerY + overlapY;
-							}
+			        		side = "top";
+			        		overlap = overlapY;
 						} else {
-			            	collision = "bottom";
-							if (fix) {
-			        			r1.y = r1.y - overlapY;
-			        			r1.centerY = r1.centerY - overlapY;
-							}
+			            	side = "bottom";
+			            	overlap = overlapY;
 			        	}
 			        } else {
 						if (vx > 0) {
-				        	collision = "left";
-				            if (fix) {
-				            	r1.x = r1.x + overlapX;
-				            	r1.centerX = r1.centerX + overlapX;
-				        	}
+				        	side = "left";
+				        	overlap = overlapX;
 			        	} else {
-				            collision = "right";
-				            if (fix) {
-					            r1.x = r1.x - overlapX;
-					            r1.centerX = r1.centerX - overlapX;
-				        	}
+				            side = "right";
+				            overlap = overlapX;
 			    		}
 			        }
 			    } else {
@@ -421,9 +388,7 @@
 		      //No collision
 		    }
 
-		    //Return the collision string. it will be either "top", "right",
-		    //"bottom", or "left" depending on which side of r1 is touching r2.
-		    return collision;
+			return {side: side, overlap: overlap};
 		}
 
 		function play() {
@@ -441,6 +406,8 @@
 			playerSprite.hitbox.centerX += playerSprite.vx;
 			playerSprite.hitbox.centerY += playerSprite.vy;
 
+
+
 			let activeWeaponbox = 0;
 			if (playerSprite.weaponbox != 0) {
 				let box = playerSprite.weaponbox[Math.floor(playerSprite.currentFrame/2)];
@@ -455,27 +422,25 @@
 
 			for (let i=0; i<groundBoxes.length; i++) {
 				let box = groundBoxes[i];
-				let coll;
-				if (coll = rectangleCollision(playerSprite.hitbox, box)) {
-					let diffX = playerSprite.hitbox.centerX - playerSprite.x,
-						diffY = playerSprite.hitbox.centerY - playerSprite.centerY;
-
-					playerSprite.x += diffX;
-					playerSprite.y += diffY;
-					playerSprite.centerX += diffX;
-					playerSprite.centerY += diffY;
-
-					if(coll == "bottom") {
+				let collision = rectangleCollision(playerSprite.hitbox, box)
+				if (collision.side) {
+					
+					moveActor(playerSprite, coll);
+					if(collision.side == "bottom") {
 						playerSprite.vy = 0;
 						playerSprite.grounded = true;
 					}
+
+					;
 				}
+
 				//hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 			}
 
+			
 			if (activeWeaponbox != 0) {
-
-				if (coll = rectangleCollision(activeWeaponbox, dummySprite.hitbox, false)) {
+				let collision = rectangleCollision(activeWeaponbox, dummySprite.hitbox);
+				if (collision.side) {
 					dummySprite.textures = dummyHitFrames;
 					dummySprite.gotoAndPlay(1 - Math.floor(playerSprite.currentFrame/2));
 				} else {
@@ -485,7 +450,9 @@
 			} else {
 				dummySprite.textures = dummyIdleFrames;
 				
-			}
+			}console.log("aftr");
+
+
 
 			if (playerSprite.grounded) {
 				if (playerSprite.textures === playerJumpFrames) {
