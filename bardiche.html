@@ -45,13 +45,14 @@
 		let groundBoxes, hitBoxRenderer;
 		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
 		let dummyIdleFrames, dummyHitFrames;
-		console.log("main")
 
 		function setup() {
 
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
+
+			hitBoxRenderer = new PIXI.Graphics();
 
 			groundBoxes = [{x: 0, y: 288, width: 352, height: 32},
 						   {x: 352, y: 224, width: 160, height: 96},
@@ -146,20 +147,11 @@
 
 			playerSprite.weaponbox = 0;
 
-			hitBoxRenderer = new PIXI.Graphics();
-
-			let con = Container();
-			con.addChild(new Sprite(tileTextures["bottom.png"]));
-			con.addChild(new Sprite(tileTextures["left.png"]));
-			
 			stage.addChild(dummySprite);
 			stage.addChild(playerSprite);
 			stage.addChild(getSpriteSet(tileTextures, getScreen1()));
-			stage.addChild(con);
 			stage.addChild(hitBoxRenderer);
 			renderer.render(stage);
-
-			console.log("components added to viewport")
 
 			keyObjectRight = keyboard(39);
 
@@ -241,8 +233,6 @@
 					playerSprite.weaponbox = 0;
 				}
 			}
-
-			console.log("return from setup")
 		}
 
 		setPlayerAnimation = function(frames, loop=true) {

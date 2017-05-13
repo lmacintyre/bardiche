@@ -21,7 +21,6 @@ const tileEnum = {
 	FIL_DRT: "fill.png"
 };
 
-
 let getScreen1 = function() {
 
 	let screen = [[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
@@ -36,23 +35,19 @@ let getScreen1 = function() {
 	return screen;
 }
 
-
-
 let getSpriteSet = function(tileset, screen) {
 	tileGroup = new Container();
-
-	console.log("tiles: " + tileset);
-	console.log(screen.length + " x " + screen[0].length);
 	
 	for (let i = 0; i < screen.length; i++) {
 		for (let j = 0; j < screen[i].length; j++) {
-			
+
 			if (screen[i][j] != 0) {
-				let newTile = new Sprite(tileset["\"" + screen[i][j] + "\""]);
+				let newTile = new Sprite(tileset[screen[i][j]]);
 
 				newTile.position.set(j*64, i*64);
 				tileGroup.addChild(newTile);
 			}
+			
 		}
 	}
 	
