@@ -14,6 +14,7 @@
 
 	<script src="keyboard.js"></script>
 	<script src="collision.js"></script>
+	<script src="levels.js"></script>
 	<script type="text/javascript">
 
 		//Aliases
@@ -23,6 +24,8 @@
 			resources = PIXI.loader.resources,
 			Sprite = PIXI.Sprite,
 			Text = PIXI.Text;
+
+		let tileSrc = screen_0;
 
 		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
@@ -38,11 +41,12 @@
 
 		let state = play;
 
-		let tileSrc, tiles, tileGroup;
+		let tiles, tileGroup;
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
 		let groundBoxes, hitBoxRenderer;
 		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
 		let dummyIdleFrames, dummyHitFrames;
+alert("main")
 
 		function setup() {
 
@@ -50,73 +54,7 @@
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
 
-			let tileEnum = {
-				FIL_AIR: 0,
-
-				STR_BOT: 1,
-				STR_TOP: 2,
-				STR_LEF: 3,
-				STR_RIG: 4,
-
-				CRN_ITR: 5,
-				CRN_ITL: 6,
-				CRN_IBR: 7,
-				CRN_IBL: 8,
-
-				CRN_OTR: 9,
-				CRN_OTL: 10,
-				CRN_OBR: 11,
-				CRN_OBL: 12,
-
-				FIL_DRT: 13
-			};
-
-			tileSrc = [[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-					   [tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_IBR, tileEnum.CRN_ITL, tileEnum.STR_TOP, tileEnum.STR_TOP, tileEnum.STR_TOP],
-					   [tileEnum.FIL_AIR, tileEnum.CRN_OBL, tileEnum.STR_TOP, tileEnum.STR_TOP, tileEnum.CRN_OBR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-					   [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.STR_BOT],
-					   [tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-					   [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-					   [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-					   [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]];
-
-			tiles = [[0, 0, 0, 0, 0, 0, 0, 0],
-					 [0, 0, 0, 0, 0, 0, 0, 0],
-					 [0, 0, 0, 0, 0, 0, 0, 0],
-					 [0, 0, 0, 0, 0, 0, 0, 0],
-					 [0, 0, 0, 0, 0, 0, 0, 0],
-					 [0, 0, 0, 0, 0, 0, 0, 0],
-					 [0, 0, 0, 0, 0, 0, 0, 0],
-					 [0, 0, 0, 0, 0, 0, 0, 0]];
-
-			tileGroup = new Container();
-			for (let i = 0; i < tileSrc.length; i++) {
-				for (let j = 0; j < tileSrc[i].length; j++) {
-					if (tileSrc[i][j] != 0) {
-						switch (tileSrc[i][j]) {
-							case tileEnum.STR_BOT: tiles[i][j] = new Sprite(tileTextures["bottom.png"]); break;
-							case tileEnum.STR_TOP: tiles[i][j] = new Sprite(tileTextures["top.png"]); break;
-							case tileEnum.STR_LEF: tiles[i][j] = new Sprite(tileTextures["left.png"]); break;
-							case tileEnum.STR_RIG: tiles[i][j] = new Sprite(tileTextures["right.png"]); break;
-
-							case tileEnum.CRN_OBL: tiles[i][j] = new Sprite(tileTextures["outside-bl.png"]); break;
-							case tileEnum.CRN_OBR: tiles[i][j] = new Sprite(tileTextures["outside-br.png"]); break;
-							case tileEnum.CRN_OTL: tiles[i][j] = new Sprite(tileTextures["outside-tl.png"]); break;
-							case tileEnum.CRN_OTR: tiles[i][j] = new Sprite(tileTextures["outside-tr.png"]); break;
-
-							case tileEnum.CRN_IBL: tiles[i][j] = new Sprite(tileTextures["inside-bl.png"]); break;
-							case tileEnum.CRN_IBR: tiles[i][j] = new Sprite(tileTextures["inside-br.png"]); break;
-							case tileEnum.CRN_ITL: tiles[i][j] = new Sprite(tileTextures["inside-tl.png"]); break;
-							case tileEnum.CRN_ITR: tiles[i][j] = new Sprite(tileTextures["inside-tr.png"]); break;
-
-							case tileEnum.FIL_DRT: tiles[i][j] = new Sprite(tileTextures["fill.png"]); break;
-						}
-
-						tiles[i][j].position.set(j*64, i*64);
-						tileGroup.addChild(tiles[i][j]);
-					}
-				}
-			}
+			tiles = getSpriteSet(tileTextures, screen_0);
 
 			groundBoxes = [{x: 0, y: 288, width: 352, height: 32},
 						   {x: 352, y: 224, width: 160, height: 96},
@@ -314,20 +252,16 @@
 			let side = collision.side, overlap = collision.overlap;
 
 			if (side == "top") {
-
 				moveActor(Actor, 0, overlap);
 
 			} else if (side == "bottom") {
-
 				moveActor(Actor, 0, overlap * -1);
 				Actor.grounded = true;
 
 			} else if (side == "left") {
-
 				moveActor(Actor, overlap, 0);
 
 			} else if (side == "right") {
-				
 				moveActor(Actor, overlap * -1, 0);
 			} 
 		}
