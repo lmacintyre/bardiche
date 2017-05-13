@@ -1,4 +1,4 @@
-function keyboard(keyCode) {
+keyboard = function(keyCode) {
 	let key = {};
 	key.code = keyCode;
 	key.isDown = false;

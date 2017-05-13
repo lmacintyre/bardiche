@@ -6,9 +6,11 @@
 </head>
 	<script src="pixi.js"></script>
 	
-<body style="background-color: #d95763">
+<body style="background-color: #d95763;">
 
-<div id="container" style="width: 512px; height: 512px; margin-left: auto; margin-right: auto; border: thick solid #ac3232;"></div>
+<div id="wrapper" style="display: flex; height: 100vh; justify-content: center; align-items: center;">
+<div id="container" style="display: inline-block; width: 512px; height: 512px; margin-left: auto; margin-right: auto; border: thick solid #ac3232;"></div>
+</div>
 
 	<script src="keyboard.js"></script>
 	<script src="collision.js"></script>
@@ -43,6 +45,7 @@
 		let dummyIdleFrames, dummyHitFrames;
 
 		function setup() {
+
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
@@ -298,7 +301,7 @@
 			}
 		}
 
-		function setPlayerAnimation(frames, loop=true) {
+		setPlayerAnimation = function(frames, loop=true) {
 			if (playerSprite.textures != frames) {
 				playerSprite.textures = frames;
 				playerSprite.gotoAndPlay(0);
@@ -307,183 +310,58 @@
 			playerSprite.loop = loop;
 		}
 
-		function moveActor(A, collision) {
+		resolveCollision = function(Actor, collision) {
+			let side = collision.side, overlap = collision.overlap;
 
-			console.log("side: " + collision.side + ", overlap: " + collision.overlap);
+			if (side == "top") {
 
-			if (collision.side == "top") {
-				A.y = A.y + collision.overlap;
-				A.centerY = A.centerY + collision.overlap;
+				moveActor(Actor, 0, overlap);
 
-				if (A.hitbox) {
-					A.hitbox.y = A.hitbox.y + collision.overlap;
-					A.hitbox.centerY = A.hitbox.centerY + collision.overlap;
-				}
-			} else if (collision.side == "bottom") {
-				A.y = A.y - collision.overlap;
-				A.centerY = A.centerY - collision.overlap;
+			} else if (side == "bottom") {
 
-				if (A.hitbox) {
-					A.hitbox.y = A.hitbox.y - collision.overlap;
-					A.hitbox.centerY = A.hitbox.centerY - collision.overlap;
-				}
-			} else if (collision.side == "left") {
-				A.x = A.x + collision.overlap;
-				A.centerX = A.centerX + collision.overlap;
+				moveActor(Actor, 0, overlap * -1);
+				Actor.grounded = true;
 
-				if (A.hitbox) {
-					A.hitbox.X = A.hitbox.X + collision.overlap;
-					A.hitbox.centerX = A.hitbox.centerX + collision.overlap;
-				}
-			} else if (collision.side == "right") {
-				A.x = A.x - collision.overlap;
-				A.centerX = A.centerX - collision.overlap;
+			} else if (side == "left") {
 
-				if (A.hitbox) {
-					A.hitbox.x = A.hitbox.x - collision.overlap;
-					A.hitbox.centerX = A.hitbox.centerX - collision.overlap;
-				}
+				moveActor(Actor, overlap, 0);
+
+			} else if (side == "right") {
+				
+				moveActor(Actor, overlap * -1, 0);
 			} 
 		}
 
-		function rectangleCollision(r1, r2) {
+		moveActor = function(Actor, dx, dy) {
+			Actor.x = Actor.x + dx;
+			Actor.y = Actor.y + dy;
+			Actor.centerX = Actor.centerX + dx;
+			Actor.centerY = Actor.centerY + dy;
 
-		    let side, overlap, combinedHalfWidths, combinedHalfHeights, overlapX, overlapY, vx, vy;
-
-		    vx = r1.centerX - r2.centerX;
-		    vy = r1.centerY - r2.centerY;
-
-		    combinedHalfWidths = Math.abs(r1.halfWidth) + Math.abs(r2.halfWidth);
-		    combinedHalfHeights = Math.abs(r1.halfHeight) + Math.abs(r2.halfHeight);
-
-		    if (Math.abs(vx) < combinedHalfWidths) {
-
-		    	if (Math.abs(vy) < combinedHalfHeights) {
-
-			        overlapX = combinedHalfWidths - Math.abs(vx);
-			        overlapY = combinedHalfHeights - Math.abs(vy);
-
-			        if (overlapX >= overlapY) {
-
-			        	if (vy > 0) {
-			        		side = "top";
-			        		overlap = overlapY;
-						} else {
-			            	side = "bottom";
-			            	overlap = overlapY;
-			        	}
-			        } else {
-						if (vx > 0) {
-				        	side = "left";
-				        	overlap = overlapX;
-			        	} else {
-				            side = "right";
-				            overlap = overlapX;
-			    		}
-			        }
-			    } else {
-			        //No collision
-			    }
-		    } else {
-		      //No collision
-		    }
-
-			return {side: side, overlap: overlap};
+			if (Actor.hitbox) {
+				Actor.hitbox.x = Actor.hitbox.x + dx;
+				Actor.hitbox.y = Actor.hitbox.y + dy;
+				Actor.hitbox.centerX = Actor.hitbox.centerX + dx;
+				Actor.hitbox.centerY = Actor.hitbox.centerY + dy;
+			}
 		}
 
 		function play() {
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
-			playerSprite.x += playerSprite.vx;
-			playerSprite.y += playerSprite.vy;
+			playerSprite.grounded = false;
+			moveActor(playerSprite, playerSprite.vx, playerSprite.vy);
 
-			playerSprite.centerX += playerSprite.vx;
-			playerSprite.centerY += playerSprite.vy;
-
-			playerSprite.hitbox.x += playerSprite.vx;
-			playerSprite.hitbox.y += playerSprite.vy;
-			playerSprite.hitbox.centerX += playerSprite.vx;
-			playerSprite.hitbox.centerY += playerSprite.vy;
-
-
-
-			let activeWeaponbox = 0;
-			if (playerSprite.weaponbox != 0) {
-				let box = playerSprite.weaponbox[Math.floor(playerSprite.currentFrame/2)];
-				activeWeaponbox = {
-					halfWidth: box.width/2,
-					halfHeight: box.height/2,
-
-					centerX: playerSprite.x + (box.width/2 + box.offsetX)*playerSprite.scale.x,
-					centerY: playerSprite.y + (box.height/2 + box.offsetY)
-				}
+			let collisionList;
+			if (collisionList = getCollisions(playerSprite.hitbox, groundBoxes)) {
+				collisionList.forEach(function(collision) {
+					resolveCollision(playerSprite, collision);
+				});
 			}
 
-			for (let i=0; i<groundBoxes.length; i++) {
-				let box = groundBoxes[i];
-				let collision = rectangleCollision(playerSprite.hitbox, box)
-				if (collision.side) {
-					
-					moveActor(playerSprite, coll);
-					if(collision.side == "bottom") {
-						playerSprite.vy = 0;
-						playerSprite.grounded = true;
-					}
+			if (!playerSprite.grounded) playerSprite.vy += 0.2;
 
-					;
-				}
-
-				//hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
-			}
-
-			
-			if (activeWeaponbox != 0) {
-				let collision = rectangleCollision(activeWeaponbox, dummySprite.hitbox);
-				if (collision.side) {
-					dummySprite.textures = dummyHitFrames;
-					dummySprite.gotoAndPlay(1 - Math.floor(playerSprite.currentFrame/2));
-				} else {
-					dummySprite.textures = dummyIdleFrames;
-					dummySprite.gotoAndPlay(1);
-				}
-			} else {
-				dummySprite.textures = dummyIdleFrames;
-				
-			}console.log("aftr");
-
-
-
-			if (playerSprite.grounded) {
-				if (playerSprite.textures === playerJumpFrames) {
-					setPlayerAnimation(playerIdleFrames);
-				}
-			} else if (activeWeaponbox === 0 && playerSprite.textures != playerJumpFrames) {
-				playerSprite.textures = playerJumpFrames;
-			}
-
-			if (playerSprite.vx < 0 && playerSprite.scale.x === 1) {
-				playerSprite.scale.x = -1;
-			} else if (playerSprite.vx > 0 && playerSprite.scale.x === -1) {
-				playerSprite.scale.x = 1;
-			}
-
-			if (playerSprite.vx === 0 && playerSprite.textures === playerWalkFrames) {
-				setPlayerAnimation(playerIdleFrames, true)
-			} else if (playerSprite.vx != 0 && playerSprite.textures === playerIdleFrames) {
-				setPlayerAnimation(playerWalkFrames, true);
-			}
-
-			//Check inputs!
-			if ((keyObjectZ.isDown || keyObjectX.isDown) && playerSprite.grounded) {
-				playerSprite.vx = 0;
-			} else if (keyObjectLeft.isDown && !keyObjectRight.isDown) {
-				playerSprite.vx = -2;
-			} else if (keyObjectRight.isDown && !keyObjectLeft.isDown) {
-				playerSprite.vx = 2;
-			}
-
-			playerSprite.vy += 0.2;
 		}
 
 		function gameLoop() {
