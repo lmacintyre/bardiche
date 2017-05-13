@@ -18,7 +18,7 @@
 
 	<script type="text/javascript">
 
-		//Aliases
+		// Aliases
 		let Container = PIXI.Container,
 			autoDetectRenderer = PIXI.autoDetectRenderer,
 			loader = PIXI.loader,
@@ -26,56 +26,87 @@
 			Sprite = PIXI.Sprite,
 			Text = PIXI.Text;
 
+		// Pixi.js settings
 		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
-		let stage = new Container(),
+		// Create the rendering environment and attach it to the page
+		let stage = new Container(),   
 			renderer = autoDetectRenderer(512, 512, {antialias: false});
 		renderer.backgroundColor = 0x639BFF;
 		document.getElementById("container").appendChild(renderer.view);
 		
+		// Load spritesheets
 		loader.add("res/tiledata.json")
 			.add("res/playerdata.json")
 			.add("res/dummydata.json")
 			.load(setup);
 
+		// Set initial game state
 		let state = play;
 
-		let tiles, tileGroup;
-		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
-		let groundBoxes, hitBoxRenderer;
+		/*
+		 *  buildAnimations
+		 *
+		 *  Builds animations from spritesheets.
+		 */
 		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
 		let dummyIdleFrames, dummyHitFrames;
+		function buildAnimations() {
 
-		function setup() {
+			// PLAYER
 
-			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
-			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
-			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
+			playerWalkFrames = []; playerIdleFrames = []; playerJumpFrames = [];
+			playerStabFrames = []; playerSlashFrames = [];
 
-			hitBoxRenderer = new PIXI.Graphics();
+			playerWalkFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-1.png"));
+			playerWalkFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
 
-			groundBoxes = [{x: 0, y: 288, width: 352, height: 32},
-						   {x: 352, y: 224, width: 160, height: 96},
-						   {x: 96, y: 96, width: 192, height: 64}];
+			playerIdleFrames.push(PIXI.Texture.fromFrame("pink-knight-stand.png"));
+			playerIdleFrames.push(PIXI.Texture.fromFrame("pink-knight-stand.png"));
 
-			for (let i=0; i<groundBoxes.length; i++) {
-				let box = groundBoxes[i];
+			playerJumpFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
+			playerJumpFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
 
-				box.halfWidth = box.width / 2;
-				box.halfHeight = box.height / 2;
-				box.centerX = box.x + box.halfWidth;
-				box.centerY = box.y + box.halfHeight;
-				
-			}
+			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-1.png"));
+			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-2.png"));
 
-			dummyIdleFrames = []
-			dummyHitFrames = []
+			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-1.png"));
+			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-2.png"));
+
+
+			// TRAINING DUMMY
+
+			dummyIdleFrames = []; dummyHitFrames = [];
 
 			dummyIdleFrames.push(PIXI.Texture.fromFrame("dummy-stand.png"));
 			dummyIdleFrames.push(PIXI.Texture.fromFrame("dummy-stand.png"));
 
 			dummyHitFrames.push(PIXI.Texture.fromFrame("dummy-hit-1.png"));
 			dummyHitFrames.push(PIXI.Texture.fromFrame("dummy-hit-2.png"));
+		}
+
+		/*
+		 *  setup
+		 *
+		 *  intitializes sprites, hitboxes, keyboard callbacks
+		 */
+		let tileGroup;
+		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
+		let groundBoxes, hitBoxRenderer;
+		let renderHitboxes;
+		function setup() {
+
+			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
+			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
+			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
+			buildAnimations();
+
+			hitBoxRenderer = new PIXI.Graphics();
+			renderHitboxes = true;
+
+			groundBoxes = screenBoxes_2;
+			buildScreenBoxes(groundBoxes);
+			tileGroup = getSpriteSet(tileTextures, screenTiles_2);
 
 			dummySprite = new PIXI.extras.AnimatedSprite(dummyIdleFrames);
 			dummySprite.animationSpeed = 0.05;
@@ -95,31 +126,6 @@
 				centerX: dummySprite.x,
 				centerY: dummySprite.y + dummySprite.height/2
 			}
-
-			playerWalkFrames = []
-			playerIdleFrames = []
-			playerJumpFrames = []
-			playerStabFrames = []
-			playerSlashFrames = []
-
-			playerWalkFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-1.png"));
-			playerWalkFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
-
-			playerIdleFrames.push(PIXI.Texture.fromFrame("pink-knight-stand.png"));
-			playerIdleFrames.push(PIXI.Texture.fromFrame("pink-knight-stand.png"));
-
-			playerJumpFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
-			playerJumpFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
-
-			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-1.png"));
-			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-1.png"));
-			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-2.png"));
-			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-2.png"));
-
-			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-1.png"));
-			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-1.png"));
-			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-2.png"));
-			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-2.png"));
 
 			playerSprite = new PIXI.extras.AnimatedSprite(playerIdleFrames);
 			playerSprite.position.set(192, 100);
@@ -147,15 +153,13 @@
 
 			playerSprite.weaponbox = 0;
 
-			stage.addChild(dummySprite);
-			stage.addChild(playerSprite);
-			stage.addChild(getSpriteSet(tileTextures, screen_1));
-			stage.addChild(hitBoxRenderer);
+			stage = buildStage(tileGroup, playerSprite, dummySprite);
 			renderer.render(stage);
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
 				playerSprite.vx -= 2;
+				playerSprite.scale.x = -1;
 
 				setAnimation(playerSprite, playerWalkFrames);
 			}
@@ -168,12 +172,13 @@
 			keyObjectRight = keyboard(39);
 			keyObjectRight.press = function() {
 				playerSprite.vx += 2;
+				playerSprite.scale.x = 1;
 
 				setAnimation(playerSprite, playerWalkFrames);
 			}
 			keyObjectRight.release = function() {
 				if (playerSprite.vx === 2) playerSprite.vx = 0;
-
+ 
 				setAnimation(playerSprite, playerIdleFrames);
 			}
 
@@ -261,6 +266,19 @@
 			}
 		}
 
+		animatePlayer = function(actor) {
+
+		}
+
+		function buildStage(newTileGroup, player, enemies=undefined) {
+			let stage = new Container()
+			if (enemies) stage.addChild(enemies);
+			stage.addChild(player);
+			stage.addChild(newTileGroup);
+
+			return stage;
+		}
+
 		function play() {
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
@@ -272,6 +290,12 @@
 			if (collisionList = getCollisions(playerSprite.hitbox, groundBoxes)) {
 				collisionList.forEach(function(collision) {
 					resolveCollision(playerSprite, collision);
+				});
+			}
+
+			if (renderHitboxes) {
+				groundBoxes.forEach(function(box) {
+					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				});
 			}
 
