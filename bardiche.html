@@ -2,9 +2,9 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<script src="pixi.js"></script>
 	<title>Bardiche</title>
 </head>
-	<script src="pixi.js"></script>
 	
 <body style="background-color: #d95763;">
 
@@ -12,9 +12,10 @@
 <div id="container" style="display: inline-block; width: 512px; height: 512px; margin-left: auto; margin-right: auto; border: thick solid #ac3232;"></div>
 </div>
 
-	<script src="keyboard.js"></script>
-	<script src="collision.js"></script>
-	<script src="levels.js"></script>
+	<script type="text/javascript" src="levels.js"></script>
+	<script type="text/javascript" src="keyboard.js"></script>
+	<script type="text/javascript" src="collision.js"></script>
+
 	<script type="text/javascript">
 
 		//Aliases
@@ -24,8 +25,6 @@
 			resources = PIXI.loader.resources,
 			Sprite = PIXI.Sprite,
 			Text = PIXI.Text;
-
-		let tileSrc = screen_0;
 
 		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
@@ -46,15 +45,13 @@
 		let groundBoxes, hitBoxRenderer;
 		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
 		let dummyIdleFrames, dummyHitFrames;
-alert("main")
+		console.log("main")
 
 		function setup() {
 
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
-
-			tiles = getSpriteSet(tileTextures, screen_0);
 
 			groundBoxes = [{x: 0, y: 288, width: 352, height: 32},
 						   {x: 352, y: 224, width: 160, height: 96},
@@ -150,12 +147,19 @@ alert("main")
 			playerSprite.weaponbox = 0;
 
 			hitBoxRenderer = new PIXI.Graphics();
+
+			let con = Container();
+			con.addChild(new Sprite(tileTextures["bottom.png"]));
+			con.addChild(new Sprite(tileTextures["left.png"]));
 			
 			stage.addChild(dummySprite);
 			stage.addChild(playerSprite);
-			stage.addChild(tileGroup);
+			stage.addChild(getSpriteSet(tileTextures, getScreen1()));
+			stage.addChild(con);
 			stage.addChild(hitBoxRenderer);
 			renderer.render(stage);
+
+			console.log("components added to viewport")
 
 			keyObjectRight = keyboard(39);
 
@@ -237,6 +241,8 @@ alert("main")
 					playerSprite.weaponbox = 0;
 				}
 			}
+
+			console.log("return from setup")
 		}
 
 		setPlayerAnimation = function(frames, loop=true) {

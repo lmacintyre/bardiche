@@ -1,3 +1,4 @@
+console.log("alert");
 
 const tileEnum = {
 	FIL_AIR: 0,
@@ -19,10 +20,11 @@ const tileEnum = {
 
 	FIL_DRT: "fill.png"
 };
-alert("built")
 
 
-const screen_0 = [[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
+let getScreen1 = function() {
+
+	let screen = [[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
 				  [tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_IBR, tileEnum.CRN_ITL, tileEnum.STR_TOP, tileEnum.STR_TOP, tileEnum.STR_TOP],
 				  [tileEnum.FIL_AIR, tileEnum.CRN_OBL, tileEnum.STR_TOP, tileEnum.STR_TOP, tileEnum.CRN_OBR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 				  [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.STR_BOT],
@@ -31,19 +33,29 @@ const screen_0 = [[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnu
 				  [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
 				  [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]];
 
+	return screen;
+}
+
+
+
 let getSpriteSet = function(tileset, screen) {
-
 	tileGroup = new Container();
-	for (let i = 0; i < tileset.length; i++) {
-		for (let j = 0; j < tileset[i].length; j++) {
-			if (tileSet[i][j] != 0) {
-				let newTile = new Sprite(tileTextures[tileset[i][j]]);;
 
+	console.log("tiles: " + tileset);
+	console.log(screen.length + " x " + screen[0].length);
+	
+	for (let i = 0; i < screen.length; i++) {
+		for (let j = 0; j < screen[i].length; j++) {
+			
+			if (screen[i][j] != 0) {
+				let newTile = new Sprite(tileset["\"" + screen[i][j] + "\""]);
 
 				newTile.position.set(j*64, i*64);
 				tileGroup.addChild(newTile);
 			}
 		}
-
-		return tileGroup;
+	}
+	
+	return tileGroup;
 }
+
