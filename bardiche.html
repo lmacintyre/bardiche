@@ -121,7 +121,7 @@
 			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-2.png"));
 			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-2.png"));
 
-			playerSprite = new PIXI.extras.AnimatedSprite(playerWalkFrames);
+			playerSprite = new PIXI.extras.AnimatedSprite(playerIdleFrames);
 			playerSprite.position.set(192, 100);
 			playerSprite.grounded = false;
 			playerSprite.centerX = playerSprite.x;
@@ -149,33 +149,36 @@
 
 			stage.addChild(dummySprite);
 			stage.addChild(playerSprite);
-			stage.addChild(getSpriteSet(tileTextures, getScreen1()));
+			stage.addChild(getSpriteSet(tileTextures, screen_1));
 			stage.addChild(hitBoxRenderer);
 			renderer.render(stage);
-
-			keyObjectRight = keyboard(39);
-
-			keyObjectRight.press = function() {
-				playerSprite.vx += 2;
-
-				setPlayerAnimation(playerWalkFrames);
-			}
-			keyObjectRight.release = function() {
-				if (playerSprite.vx === 2) playerSprite.vx = 0;
-			}
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
 				playerSprite.vx -= 2;
 
-				setPlayerAnimation(playerWalkFrames);
+				setAnimation(playerSprite, playerWalkFrames);
 			}
 			keyObjectLeft.release = function() {
 				if (playerSprite.vx === -2) playerSprite.vx = 0;
+
+				setAnimation(playerSprite, playerIdleFrames);
+			}
+
+			keyObjectRight = keyboard(39);
+			keyObjectRight.press = function() {
+				playerSprite.vx += 2;
+
+				setAnimation(playerSprite, playerWalkFrames);
+			}
+			keyObjectRight.release = function() {
+				if (playerSprite.vx === 2) playerSprite.vx = 0;
+
+				setAnimation(playerSprite, playerIdleFrames);
 			}
 
 			keyObjectUp = keyboard(38);
-			keyObjectUp.press = function() {
+			keyObjectUp.press = function() {   
 				if (playerSprite.grounded) {
 					playerSprite.grounded = false;
 					playerSprite.vy = -5;
@@ -235,31 +238,13 @@
 			}
 		}
 
-		setPlayerAnimation = function(frames, loop=true) {
-			if (playerSprite.textures != frames) {
-				playerSprite.textures = frames;
-				playerSprite.gotoAndPlay(0);
+		setAnimation = function(actor, frames, loop=true) {
+			if (actor.textures != frames) {
+				actor.textures = frames;
+				actor.gotoAndPlay(0);
 			}
 
-			playerSprite.loop = loop;
-		}
-
-		resolveCollision = function(Actor, collision) {
-			let side = collision.side, overlap = collision.overlap;
-
-			if (side == "top") {
-				moveActor(Actor, 0, overlap);
-
-			} else if (side == "bottom") {
-				moveActor(Actor, 0, overlap * -1);
-				Actor.grounded = true;
-
-			} else if (side == "left") {
-				moveActor(Actor, overlap, 0);
-
-			} else if (side == "right") {
-				moveActor(Actor, overlap * -1, 0);
-			} 
+			actor.loop = loop;
 		}
 
 		moveActor = function(Actor, dx, dy) {
@@ -291,7 +276,6 @@
 			}
 
 			if (!playerSprite.grounded) playerSprite.vy += 0.2;
-
 		}
 
 		function gameLoop() {

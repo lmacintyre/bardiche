@@ -56,3 +56,21 @@ getCollisions = function(hitbox, checkArray) {
 
 	if (result.length > 0) return result;
 }
+
+resolveCollision = function(Actor, collision) {
+	let side = collision.side, overlap = collision.overlap;
+
+	if (side == "top") {
+		moveActor(Actor, 0, overlap);
+
+	} else if (side == "bottom") {
+		moveActor(Actor, 0, overlap * -1);
+		Actor.grounded = true;
+
+	} else if (side == "left") {
+		moveActor(Actor, overlap, 0);
+
+	} else if (side == "right") {
+		moveActor(Actor, overlap * -1, 0);
+	} 
+}
