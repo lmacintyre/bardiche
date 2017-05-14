@@ -158,28 +158,12 @@
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
-				playerSprite.vx -= 2;
 				playerSprite.scale.x = -1;
-
-				setAnimation(playerSprite, playerWalkFrames);
-			}
-			keyObjectLeft.release = function() {
-				if (playerSprite.vx === -2) playerSprite.vx = 0;
-
-				setAnimation(playerSprite, playerIdleFrames);
 			}
 
 			keyObjectRight = keyboard(39);
 			keyObjectRight.press = function() {
-				playerSprite.vx += 2;
 				playerSprite.scale.x = 1;
-
-				setAnimation(playerSprite, playerWalkFrames);
-			}
-			keyObjectRight.release = function() {
-				if (playerSprite.vx === 2) playerSprite.vx = 0;
- 
-				setAnimation(playerSprite, playerIdleFrames);
 			}
 
 			keyObjectUp = keyboard(38);
@@ -193,6 +177,7 @@
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
 				setAnimation(playerSprite, playerStabFrames, true);
+				playerSprite.animationSpeed = 0.05;
 
 				playerSprite.weaponbox = [{
 					offsetX: 6,
@@ -212,6 +197,7 @@
 				playerSprite.loop = false;
 				playerSprite.onComplete = function() {
 					setAnimation(playerSprite, playerIdleFrames);
+					playerSprite.animationSpeed = 0.1;
 					playerSprite.weaponbox = 0;
 				}
 			}
@@ -219,6 +205,7 @@
 			keyObjectX = keyboard(88);
 			keyObjectX.press = function() {
 				setAnimation(playerSprite, playerSlashFrames, true);
+				playerSprite.animationSpeed = 0.05;
 
 				playerSprite.weaponbox = [{
 					offsetX: 14,
@@ -238,6 +225,7 @@
 				playerSprite.loop = false;
 				playerSprite.onComplete = function() {
 					setAnimation(playerSprite, playerIdleFrames);
+					playerSprite.animationSpeed = 0.1;
 					playerSprite.weaponbox = 0;
 				}
 			}
@@ -267,14 +255,29 @@
 			}
 		}
 
-		animatePlayer = function(actor) {
-			if (actor.weaponbox) {
+		animatePlayer = function() {
+			if (playerSprite.weaponbox) {
 
 			} else {
-				if (actor.grounded) {
-
+				if (playerSprite.grounded) {
+					if (playerSprite.vx === 0) setAnimation(playerSprite, playerIdleFrames);
+					else setAnimation(playerSprite, playerWalkFrames);
 				} else {
+					setAnimation(playerSprite, playerJumpFrames);
+				}
+			}
+		}
 
+		controlPlayer = function() {
+			if (playerSprite.grounded && playerSprite.weaponbox) {
+				playerSprite.vx = 0;
+			} else {
+				if (keyObjectRight.isDown && !keyObjectLeft.isDown) {
+					playerSprite.vx = 2;
+				} else if (keyObjectLeft.isDown && !keyObjectRight.isDown) {
+					playerSprite.vx = -2;
+				} else {
+					playerSprite.vx = 0
 				}
 			}
 		}
@@ -365,6 +368,9 @@
 			}
 
 			if (!playerSprite.grounded) playerSprite.vy += 0.2;
+
+			controlPlayer();
+			animatePlayer();
 		}
 
 		function gameLoop() {
