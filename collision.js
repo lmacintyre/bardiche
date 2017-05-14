@@ -43,6 +43,14 @@ rectangleCollision = function(r1, r2) {
 	if (side) return {side: side, overlap: overlap};
 }
 
+buildHitbox = function(hitbox) {
+		console.log("build a new hitbox!")
+		hitbox.halfWidth = hitbox.width / 2;
+		hitbox.halfHeight = hitbox.height / 2;
+		hitbox.centerX = hitbox.x + hitbox.halfWidth;
+		hitbox.centerY = hitbox.y + hitbox.halfHeight;
+}
+
 getCollisions = function(hitbox, checkArray) {
 	let result = [];
 

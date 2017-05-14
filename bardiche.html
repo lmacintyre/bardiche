@@ -104,10 +104,6 @@
 			hitBoxRenderer = new PIXI.Graphics();
 			renderHitboxes = true;
 
-			groundBoxes = screenBoxes_2;
-			buildScreenBoxes(groundBoxes);
-			tileGroup = getSpriteSet(tileTextures, screenTiles_2);
-
 			dummySprite = new PIXI.extras.AnimatedSprite(dummyIdleFrames);
 			dummySprite.animationSpeed = 0.05;
 			dummySprite.play();
@@ -143,17 +139,11 @@
 			playerSprite.hitbox = {x: playerSprite.x - 16,
 								   y: playerSprite.y + 32,
 								   width: 32,
-								   height: 64,
-								   halfWidth: 16,
-								   halfHeight: 32
-								   };
-
-			playerSprite.hitbox.centerY = playerSprite.hitbox.y + playerSprite.hitbox.halfHeight;
-			playerSprite.hitbox.centerX = playerSprite.x;
+								   height: 64};
 
 			playerSprite.weaponbox = 0;
 
-			stage = buildStage(tileGroup, playerSprite, dummySprite);
+			stage = buildStage(screenTiles_2, screenBoxes_2, playerSprite, dummySprite);
 			renderer.render(stage);
 
 			keyObjectLeft = keyboard(37);
@@ -270,11 +260,19 @@
 
 		}
 
-		function buildStage(newTileGroup, player, enemies=undefined) {
+		function buildStage(newScreenTiles, newScreenBoxes, player, enemies=undefined) {
+			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let stage = new Container()
+
+			groundBoxes = newScreenBoxes;
+			buildScreenBoxes(groundBoxes);
+
+			buildHitbox(playerSprite.hitbox);
+			
 			if (enemies) stage.addChild(enemies);
 			stage.addChild(player);
-			stage.addChild(newTileGroup);
+			stage.addChild(getSpriteSet(tileTextures, newScreenTiles));
+			stage.addChild(hitBoxRenderer);
 
 			return stage;
 		}
@@ -283,10 +281,27 @@
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
+
+			if (playerSprite.x < 0) {
+
+				playerSprite.x += 512;
+				playerSprite.hitbox.x += 512;
+				
+				stage = buildStage(screenTiles_1, screenBoxes_1, playerSprite, dummySprite)
+			
+			} else if (playerSprite.x > 512) {
+
+				playerSprite.x -= 512;
+				playerSprite.hitbox.x -= 512;
+
+				stage = buildStage(screenTiles_2, screenBoxes_2, playerSprite);
+			}
+
 			playerSprite.grounded = false;
 			moveActor(playerSprite, playerSprite.vx, playerSprite.vy);
 
 			let collisionList;
+			//console.log(groundBoxes[0])
 			if (collisionList = getCollisions(playerSprite.hitbox, groundBoxes)) {
 				collisionList.forEach(function(collision) {
 					resolveCollision(playerSprite, collision);
@@ -297,6 +312,8 @@
 				groundBoxes.forEach(function(box) {
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				});
+
+				hitBoxRenderer.drawRect(playerSprite.hitbox.x, playerSprite.hitbox.y, playerSprite.hitbox.width, playerSprite.hitbox.height);
 			}
 
 			if (!playerSprite.grounded) playerSprite.vy += 0.2;
