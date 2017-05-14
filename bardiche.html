@@ -39,6 +39,8 @@
 		loader.add("res/tiledata.json")
 			.add("res/playerdata.json")
 			.add("res/dummydata.json")
+			.add("res/pumpking.png")
+			.add("res/background.png")
 			.load(setup);
 
 		// Set initial game state
@@ -49,6 +51,7 @@
 		 *
 		 *  Builds animations from spritesheets.
 		 */
+		let playerSprite, dummySprite, bigdummySprite;
 		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
 		let dummyIdleFrames, dummyHitFrames;
 		function buildAnimations() {
@@ -94,6 +97,7 @@
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
 		let groundBoxes, hitBoxRenderer;
 		let renderHitboxes;
+		let backgroundSprite;
 		function setup() {
 
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
@@ -102,14 +106,20 @@
 			buildAnimations();
 
 			hitBoxRenderer = new PIXI.Graphics();
-			renderHitboxes = true;
+			renderHitboxes = false;
+
+			backgroundSprite = new Sprite(resources["res/background.png"].texture);
+			bigdummySprite = new Sprite(resources["res/pumpking.png"].texture);
+			bigdummySprite.scale.set(2, 2);
+			bigdummySprite.y = 160;
+			bigdummySprite.x = 192;
 
 			dummySprite = new PIXI.extras.AnimatedSprite(dummyIdleFrames);
 			dummySprite.animationSpeed = 0.05;
 			dummySprite.play();
 			dummySprite.anchor.x = 0.5;
 			dummySprite.x = 96;
-			dummySprite.y = 192;
+			dummySprite.y = 324;
 
 			dummySprite.hitbox = {
 				x: dummySprite.x - dummySprite.width/6,
@@ -124,7 +134,7 @@
 			}
 
 			playerSprite = new PIXI.extras.AnimatedSprite(playerIdleFrames);
-			playerSprite.position.set(192, 100);
+			playerSprite.position.set(32, 320);
 			playerSprite.grounded = false;
 			playerSprite.centerX = playerSprite.x;
 			playerSprite.centerY = playerSprite.y + playerSprite.height / 2;
@@ -143,7 +153,7 @@
 
 			playerSprite.weaponbox = 0;
 
-			stage = buildStage(screenTiles_2, screenBoxes_2, playerSprite, dummySprite);
+			stage = buildStage(screenTiles[0], screenBoxes[0], playerSprite, dummySprite);
 			renderer.render(stage);
 
 			keyObjectLeft = keyboard(37);
@@ -182,7 +192,7 @@
 
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
-				setPlayerAnimation(playerStabFrames, true);
+				setAnimation(playerSprite, playerStabFrames, true);
 
 				playerSprite.weaponbox = [{
 					offsetX: 6,
@@ -201,14 +211,14 @@
 			keyObjectZ.release = function() {
 				playerSprite.loop = false;
 				playerSprite.onComplete = function() {
-					setPlayerAnimation(playerIdleFrames);
+					setAnimation(playerSprite, playerIdleFrames);
 					playerSprite.weaponbox = 0;
 				}
 			}
 
 			keyObjectX = keyboard(88);
 			keyObjectX.press = function() {
-				setPlayerAnimation(playerSlashFrames, true);
+				setAnimation(playerSprite, playerSlashFrames, true);
 
 				playerSprite.weaponbox = [{
 					offsetX: 14,
@@ -227,7 +237,7 @@
 			keyObjectX.release = function() {
 				playerSprite.loop = false;
 				playerSprite.onComplete = function() {
-					setPlayerAnimation(playerIdleFrames);
+					setAnimation(playerSprite, playerIdleFrames);
 					playerSprite.weaponbox = 0;
 				}
 			}
@@ -237,6 +247,7 @@
 			if (actor.textures != frames) {
 				actor.textures = frames;
 				actor.gotoAndPlay(0);
+				actor.updateTexture();
 			}
 
 			actor.loop = loop;
@@ -257,7 +268,30 @@
 		}
 
 		animatePlayer = function(actor) {
+			if (actor.weaponbox) {
 
+			} else {
+				if (actor.grounded) {
+
+				} else {
+
+				}
+			}
+		}
+
+		buildWeaponbox = function(actor, weaponboxBase) {
+
+			let h = {
+				x: actor.x + weaponboxBase.offsetX * actor.scale.x,
+				y: actor.y + weaponboxBase.offsetY * actor.scale.y,
+
+				width: weaponboxBase.width * actor.scale.x,
+				height: weaponboxBase.height * actor.scale.y
+			}
+
+			buildHitbox(h);
+
+			return h;
 		}
 
 		function buildStage(newScreenTiles, newScreenBoxes, player, enemies=undefined) {
@@ -269,6 +303,7 @@
 
 			buildHitbox(playerSprite.hitbox);
 			
+			stage.addChild(backgroundSprite);
 			if (enemies) stage.addChild(enemies);
 			stage.addChild(player);
 			stage.addChild(getSpriteSet(tileTextures, newScreenTiles));
@@ -281,31 +316,40 @@
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
-
 			if (playerSprite.x < 0) {
 
 				playerSprite.x += 512;
 				playerSprite.hitbox.x += 512;
 				
-				stage = buildStage(screenTiles_1, screenBoxes_1, playerSprite, dummySprite)
+				stage = buildStage(screenTiles[0], screenBoxes[0], playerSprite, dummySprite)
 			
 			} else if (playerSprite.x > 512) {
 
 				playerSprite.x -= 512;
 				playerSprite.hitbox.x -= 512;
 
-				stage = buildStage(screenTiles_2, screenBoxes_2, playerSprite);
+				stage = buildStage(screenTiles[1], screenBoxes[1], playerSprite, bigdummySprite);
 			}
 
 			playerSprite.grounded = false;
 			moveActor(playerSprite, playerSprite.vx, playerSprite.vy);
 
 			let collisionList;
-			//console.log(groundBoxes[0])
 			if (collisionList = getCollisions(playerSprite.hitbox, groundBoxes)) {
 				collisionList.forEach(function(collision) {
 					resolveCollision(playerSprite, collision);
 				});
+			}
+
+			if (playerSprite.weaponbox) {
+				let activeWeaponbox = buildWeaponbox(playerSprite, playerSprite.weaponbox[playerSprite.currentFrame]);
+				if (collisionList = getCollisions(activeWeaponbox, [dummySprite.hitbox])) {
+					setAnimation(dummySprite, dummyHitFrames);
+					dummySprite.gotoAndPlay(1 - playerSprite.currentFrame);
+					dummySprite.updateTexture();
+				}
+			} else {
+				setAnimation(dummySprite, dummyIdleFrames)
 			}
 
 			if (renderHitboxes) {
@@ -314,6 +358,10 @@
 				});
 
 				hitBoxRenderer.drawRect(playerSprite.hitbox.x, playerSprite.hitbox.y, playerSprite.hitbox.width, playerSprite.hitbox.height);
+				if (playerSprite.weaponbox) {
+					let box = buildWeaponbox(playerSprite, playerSprite.weaponbox[playerSprite.currentFrame]);
+					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
+				}
 			}
 
 			if (!playerSprite.grounded) playerSprite.vy += 0.2;

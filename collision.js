@@ -44,7 +44,6 @@ rectangleCollision = function(r1, r2) {
 }
 
 buildHitbox = function(hitbox) {
-		console.log("build a new hitbox!")
 		hitbox.halfWidth = hitbox.width / 2;
 		hitbox.halfHeight = hitbox.height / 2;
 		hitbox.centerX = hitbox.x + hitbox.halfWidth;
