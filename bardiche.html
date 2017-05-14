@@ -45,6 +45,7 @@
 
 		// Set initial game state
 		let state = play;
+		let screen = 0;
 
 		/*
 		 *  buildAnimations
@@ -129,7 +130,7 @@
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
 
-			bigdummySprite = new PIXI.extras.AnimatedSprite(kingIdleFrames);
+			bigdummySprite = new PIXI.extras.AnimatedSprite(kingSleepFrames);
 			bigdummySprite.animationSpeed = 0.1;
 			bigdummySprite.play();
 			bigdummySprite.y = 160;
@@ -250,6 +251,12 @@
 					playerSprite.weaponbox = 0;
 				}
 			}
+
+			eventBoxes.forEach(function(set) {
+				set.forEach(function(box) {
+					buildHitbox(box);
+				});
+			});
 		}
 
 		setAnimation = function(actor, frames, loop=true) {
@@ -344,15 +351,19 @@
 
 				playerSprite.x += 512;
 				playerSprite.hitbox.x += 512;
+
+				screen--;
 				
-				stage = buildStage(screenTiles[0], screenBoxes[0], playerSprite, dummySprite)
+				stage = buildStage(screenTiles[screen], screenBoxes[screen], playerSprite, dummySprite)
 			
 			} else if (playerSprite.x > 512) {
 
 				playerSprite.x -= 512;
 				playerSprite.hitbox.x -= 512;
 
-				stage = buildStage(screenTiles[1], screenBoxes[1], playerSprite, bigdummySprite);
+				screen++;
+
+				stage = buildStage(screenTiles[screen], screenBoxes[screen], playerSprite, bigdummySprite);
 			}
 
 			playerSprite.grounded = false;
@@ -387,6 +398,15 @@
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				}
 			}
+
+			eventBoxes[screen].forEach(function(box) {
+				let collision = rectangleCollision(playerSprite.hitbox, box);
+				if (!box.playerPresent && collision) {
+					box.onPlayerEnter();
+				} else if (box.playerPresent && collision == undefined) {
+					box.playerPresent = false;
+				}
+			});
 
 			if (!playerSprite.grounded) playerSprite.vy += 0.2;
 

@@ -43,7 +43,6 @@ screenTiles = [
 
 ];
 
-
 screenBoxes = [
 
 	[{x: 0, y: 416, width: 224, height: 32},
@@ -53,6 +52,24 @@ screenBoxes = [
 	[{x: 0, y: 288, width: 96, height: 128},
 	{x: 0, y: 416, width: 512, height: 32}]
 
+];
+
+eventBoxes = [
+	[],
+
+	[{
+		x: 96, y: 384, width: 416, height: 32,
+		playerPresent: false,
+		onPlayerEnter: function() {
+			if (bigdummySprite.textures === kingSleepFrames) {
+				setAnimation(bigdummySprite, kingWakeFrames, false);
+				bigdummySprite.onComplete = function() {
+					setAnimation(bigdummySprite, kingIdleFrames);
+				}
+			}
+			this.playerPresent = true;
+		}
+	}]
 ];
 
 let getSpriteSet = function(tileset, screen) {
