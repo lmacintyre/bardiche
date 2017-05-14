@@ -39,7 +39,7 @@
 		loader.add("res/tiledata.json")
 			.add("res/playerdata.json")
 			.add("res/dummydata.json")
-			.add("res/pumpking.png")
+			.add("res/pumpkingdata.json")
 			.add("res/background.png")
 			.load(setup);
 
@@ -54,6 +54,7 @@
 		let playerSprite, dummySprite, bigdummySprite;
 		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
 		let dummyIdleFrames, dummyHitFrames;
+		let kingSleepFrames, kingWakeFrames, kingIdleFrames;
 		function buildAnimations() {
 
 			// PLAYER
@@ -86,6 +87,23 @@
 
 			dummyHitFrames.push(PIXI.Texture.fromFrame("dummy-hit-1.png"));
 			dummyHitFrames.push(PIXI.Texture.fromFrame("dummy-hit-2.png"));
+
+			// PUMPKING
+
+			kingSleepFrames = []; kingWakeFrames = []; kingIdleFrames = [];
+
+			kingSleepFrames.push(PIXI.Texture.fromFrame("pumpking-sleep"));
+
+			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-1"));
+			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-2"));
+			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-3"));
+			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-4"));
+			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-5"));
+
+			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-1"));
+			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-2"));
+			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-3"));
+			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-4"));
 		}
 
 		/*
@@ -103,14 +121,17 @@
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
+			let kingTextures = PIXI.loader.resources["res/pumpkingdata.json"].textures;
 			buildAnimations();
 
 			hitBoxRenderer = new PIXI.Graphics();
 			renderHitboxes = false;
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
-			bigdummySprite = new Sprite(resources["res/pumpking.png"].texture);
-			bigdummySprite.scale.set(2, 2);
+
+			bigdummySprite = new PIXI.extras.AnimatedSprite(kingIdleFrames);
+			bigdummySprite.animationSpeed = 0.1;
+			bigdummySprite.play();
 			bigdummySprite.y = 160;
 			bigdummySprite.x = 192;
 
