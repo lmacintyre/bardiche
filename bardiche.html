@@ -41,6 +41,7 @@
 			.add("res/dummydata.json")
 			.add("res/pumpkingdata.json")
 			.add("res/background.png")
+			.add("res/blacksmith.png")
 			.load(setup);
 
 		// Set initial game state
@@ -116,7 +117,7 @@
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
 		let groundBoxes, hitBoxRenderer;
 		let renderHitboxes;
-		let backgroundSprite;
+		let backgroundSprite, blacksmithSprite;
 		function setup() {
 
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
@@ -129,6 +130,10 @@
 			renderHitboxes = false;
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
+
+			blacksmithSprite = new Sprite(resources["res/blacksmith.png"].texture);
+			blacksmithSprite.position.set(352, 160);
+			blacksmithSprite.scale.set(2, 2);
 
 			bigdummySprite = new PIXI.extras.AnimatedSprite(kingSleepFrames);
 			bigdummySprite.animationSpeed = 0.1;
@@ -175,7 +180,7 @@
 
 			playerSprite.weaponbox = 0;
 
-			stage = buildStage(screenTiles[0], screenBoxes[0], playerSprite, dummySprite);
+			stage = buildStage(screenTiles[0], screenBoxes[0], playerSprite, blacksmithSprite);
 			renderer.render(stage);
 
 			keyObjectLeft = keyboard(37);
