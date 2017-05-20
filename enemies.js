@@ -50,14 +50,18 @@ buildEnemy = function(enemy) {
 	enemy.sprite = new PIXI.extras.AnimatedSprite(enemy.activeAnimation);
 	enemy.sprite.anchor.set(0.5, 0.5);
 	enemy.sprite.play();
-
-	//Build hitbox
-	buildHitbox(enemy.hitbox);
 	
 	return enemy;
 }
 
 placeEnemy = function(enemy, x, y) {
+	console.log("PA: " + x);
 	enemy.sprite.position.set(x, y);
+
+	//Build hitbox
+	enemy.hitbox.x = x;
+	enemy.hitbox.y = y;
+	buildHitbox(enemy.hitbox);
+
 	return enemy;
 }

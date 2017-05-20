@@ -121,7 +121,7 @@
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
 		let groundBoxes, hitBoxRenderer;
 		let renderHitboxes;
-		let backgroundSprite, blacksmithSprite;
+		let backgroundSprite;
 		function setup() {
 
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
@@ -136,13 +136,9 @@
 			};
 
 			hitBoxRenderer = new PIXI.Graphics();
-			renderHitboxes = false;
+			renderHitboxes = true;
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
-
-			blacksmithSprite = new Sprite(resources["res/blacksmith.png"].texture);
-			blacksmithSprite.position.set(352, 160);
-			blacksmithSprite.scale.set(2, 2);
 
 			bigdummySprite = new PIXI.extras.AnimatedSprite(kingSleepFrames);
 			bigdummySprite.animationSpeed = 0.1;
@@ -341,20 +337,22 @@
 			return h;
 		}
 
-		function buildStage(newScreen, player) {
+		function buildStage(newScreen, enemies, player) {
 			
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let stage = new Container()
 
 			groundBoxes = newScreen.groundBoxes;
 			buildScreenBoxes(groundBoxes);
-
-			buildHitbox(playerSprite.hitbox);
 			
 			stage.addChild(backgroundSprite);
-			newScreen.enemies.forEach(function(enemy) {
-				stage.addChild(placeEnemy(buildEnemy(enemy.name), enemy.position.x, enemy.position.y).sprite);
+
+			enemies.forEach(function(enemy) {
+				console.log(enemy.sprite.x);
+				stage.addChild(enemy.sprite);
 			});
+
+			buildHitbox(playerSprite.hitbox);
 			stage.addChild(player);
 			
 			stage.addChild(getSpriteSet(tileTextures, newScreen.tiles));
@@ -364,12 +362,24 @@
 		}
 
 		function setActiveScreen(key) {
-			let enemies = screens[key].enemies;
-			activeScreen.enemies.forEach(function(enemy) {
-				placeEnemy(buildEnemy(enemy.name), enemy.position.x, enemy.position.y);
+			let enemiesSrc = screens[key].enemies;
+			activeScreen.enemies = [];
+			enemiesSrc.forEach(function(enemy) {
+				bld = buildEnemy(enemy.name);
+				console.log("after build: " + enemy.position.x)
+				plc = placeEnemy(bld, enemy.position.x, enemy.position.y);
+				console.log("after place: " + plc.sprite.position.x)
+
+				activeScreen.enemies.push(plc);
 			});
 
-			activeScreen.stage = buildStage(screens[key], playerSprite);
+			//console.log(activeScreen.enemies)
+			activeScreen.enemies.forEach(function(enemy) {
+				console.log("sas " + enemy.sprite.position.x);
+			});
+
+			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, playerSprite);
+
 		}
 
 		function play() {
@@ -386,7 +396,6 @@
 			} else if (playerSprite.x > 512) {
 
 				moveActor(playerSprite, -512, 0);
-
 				screen++;
 
 				setActiveScreen(screen);
@@ -427,6 +436,11 @@
 					let box = buildWeaponbox(playerSprite, playerSprite.weaponbox[playerSprite.currentFrame]);
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				}
+
+				activeScreen.enemies.forEach(function(enemy) {
+					let box = enemy.hitbox;
+					hitBoxRenderer.drawRect(box.centerX - box.width/2, box.centerY - box.height/2, box.width, box.height);
+				});
 			}
 
 			eventBoxes[screen].forEach(function(box) {
@@ -447,7 +461,7 @@
 		function gameLoop() {
 			requestAnimationFrame(gameLoop);
 			state();
-			renderer.render(stage);
+			renderer.render(activeScreen.stage);
 		}
 
 		gameLoop();
