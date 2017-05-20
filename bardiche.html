@@ -11,10 +11,11 @@
 <div id="wrapper" style="display: flex; height: 100vh; justify-content: center; align-items: center;">
 <div id="container" style="display: inline-block; width: 512px; height: 512px; margin-left: auto; margin-right: auto; border: thick solid #ac3232;"></div>
 </div>
-
-	<script type="text/javascript" src="levels.js"></script>
 	<script type="text/javascript" src="keyboard.js"></script>
 	<script type="text/javascript" src="collision.js"></script>
+
+	<script type="text/javascript" src="enemies.js"></script>
+	<script type="text/javascript" src="levels.js"></script>
 
 	<script type="text/javascript">
 
@@ -40,6 +41,7 @@
 			.add("res/playerdata.json")
 			.add("res/dummydata.json")
 			.add("res/pumpkingdata.json")
+			.add("res/nuttboydata.json")
 			.add("res/background.png")
 			.add("res/blacksmith.png")
 			.load(setup);
@@ -53,7 +55,7 @@
 		 *
 		 *  Builds animations from spritesheets.
 		 */
-		let playerSprite, dummySprite, bigdummySprite;
+		let playerSprite, dummySprite, bigdummySprite, nuttboySprite;
 		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
 		let dummyIdleFrames, dummyHitFrames;
 		let kingSleepFrames, kingWakeFrames, kingIdleFrames;
@@ -113,6 +115,8 @@
 		 *
 		 *  intitializes sprites, hitboxes, keyboard callbacks
 		 */
+		let activeScreen;
+
 		let tileGroup;
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
 		let groundBoxes, hitBoxRenderer;
@@ -125,6 +129,11 @@
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
 			let kingTextures = PIXI.loader.resources["res/pumpkingdata.json"].textures;
 			buildAnimations();
+
+			activeScreen = {
+				stage: undefined,
+				enemies: []
+			};
 
 			hitBoxRenderer = new PIXI.Graphics();
 			renderHitboxes = false;
@@ -180,8 +189,10 @@
 
 			playerSprite.weaponbox = 0;
 
-			stage = buildStage(screenTiles[0], screenBoxes[0], playerSprite, blacksmithSprite);
-			renderer.render(stage);
+			let testEnemy = buildEnemy(enemy_nuttboy);
+
+			setActiveScreen(0);
+			renderer.render(activeScreen.stage);
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
@@ -330,22 +341,35 @@
 			return h;
 		}
 
-		function buildStage(newScreenTiles, newScreenBoxes, player, enemies=undefined) {
+		function buildStage(newScreen, player) {
+			
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let stage = new Container()
 
-			groundBoxes = newScreenBoxes;
+			groundBoxes = newScreen.groundBoxes;
 			buildScreenBoxes(groundBoxes);
 
 			buildHitbox(playerSprite.hitbox);
 			
 			stage.addChild(backgroundSprite);
-			if (enemies) stage.addChild(enemies);
+			newScreen.enemies.forEach(function(enemy) {
+				stage.addChild(placeEnemy(buildEnemy(enemy.name), enemy.position.x, enemy.position.y).sprite);
+			});
 			stage.addChild(player);
-			stage.addChild(getSpriteSet(tileTextures, newScreenTiles));
+			
+			stage.addChild(getSpriteSet(tileTextures, newScreen.tiles));
 			stage.addChild(hitBoxRenderer);
 
 			return stage;
+		}
+
+		function setActiveScreen(key) {
+			let enemies = screens[key].enemies;
+			activeScreen.enemies.forEach(function(enemy) {
+				placeEnemy(buildEnemy(enemy.name), enemy.position.x, enemy.position.y);
+			});
+
+			activeScreen.stage = buildStage(screens[key], playerSprite);
 		}
 
 		function play() {
@@ -354,21 +378,18 @@
 
 			if (playerSprite.x < 0) {
 
-				playerSprite.x += 512;
-				playerSprite.hitbox.x += 512;
-
+				moveActor(playerSprite, 512, 0);
 				screen--;
 				
-				stage = buildStage(screenTiles[screen], screenBoxes[screen], playerSprite, dummySprite)
+				setActiveScreen(screen);
 			
 			} else if (playerSprite.x > 512) {
 
-				playerSprite.x -= 512;
-				playerSprite.hitbox.x -= 512;
+				moveActor(playerSprite, -512, 0);
 
 				screen++;
 
-				stage = buildStage(screenTiles[screen], screenBoxes[screen], playerSprite, bigdummySprite);
+				setActiveScreen(screen);
 			}
 
 			playerSprite.grounded = false;
@@ -380,6 +401,10 @@
 					resolveCollision(playerSprite, collision);
 				});
 			}
+
+			screens[screen].enemies.forEach(function(enemy) {
+				if (!enemy.grounded);
+			});
 
 			if (playerSprite.weaponbox) {
 				let activeWeaponbox = buildWeaponbox(playerSprite, playerSprite.weaponbox[playerSprite.currentFrame]);

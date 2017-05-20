@@ -38,8 +38,7 @@ screenTiles = [
 	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT],
-	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]
-]
+	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
 
 ];
 
@@ -71,6 +70,31 @@ eventBoxes = [
 		}
 	}]
 ];
+
+screenEnemies = [
+	[{name: enemy_nuttboy, position: {x: 128, y: 128}},
+	 {name: enemy_nuttboy, position: {x: 256, y: 128}}],
+
+	[]
+]
+
+screens = [
+
+	{
+		tiles: screenTiles[0],
+		groundBoxes: screenBoxes[0],
+		eventBoxes: eventBoxes[0],
+		enemies: screenEnemies[0]
+	},
+
+	{
+		tiles: screenTiles[1],
+		groundBoxes: screenBoxes[1],
+		eventBoxes: eventBoxes[1],
+		enemies: screenEnemies[1]
+	}
+
+]
 
 let getSpriteSet = function(tileset, screen) {
 	tileGroup = new Container();
