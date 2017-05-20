@@ -14,6 +14,7 @@
 	<script type="text/javascript" src="keyboard.js"></script>
 	<script type="text/javascript" src="collision.js"></script>
 
+	<script type="text/javascript" src="player.js"></script>
 	<script type="text/javascript" src="enemies.js"></script>
 	<script type="text/javascript" src="levels.js"></script>
 
@@ -43,7 +44,6 @@
 			.add("res/pumpkingdata.json")
 			.add("res/nuttboydata.json")
 			.add("res/background.png")
-			.add("res/blacksmith.png")
 			.load(setup);
 
 		// Set initial game state
@@ -51,71 +51,12 @@
 		let screen = 0;
 
 		/*
-		 *  buildAnimations
-		 *
-		 *  Builds animations from spritesheets.
-		 */
-		let playerSprite, dummySprite, bigdummySprite, nuttboySprite;
-		let playerWalkFrames, playerIdleFrames, playerJumpFrames, playerStabFrames, playerSlashFrames;
-		let dummyIdleFrames, dummyHitFrames;
-		let kingSleepFrames, kingWakeFrames, kingIdleFrames;
-		function buildAnimations() {
-
-			// PLAYER
-
-			playerWalkFrames = []; playerIdleFrames = []; playerJumpFrames = [];
-			playerStabFrames = []; playerSlashFrames = [];
-
-			playerWalkFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-1.png"));
-			playerWalkFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
-
-			playerIdleFrames.push(PIXI.Texture.fromFrame("pink-knight-stand.png"));
-			playerIdleFrames.push(PIXI.Texture.fromFrame("pink-knight-stand.png"));
-
-			playerJumpFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
-			playerJumpFrames.push(PIXI.Texture.fromFrame("pink-knight-walk-2.png"));
-
-			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-1.png"));
-			playerStabFrames.push(PIXI.Texture.fromFrame("pink-knight-stab-2.png"));
-
-			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-1.png"));
-			playerSlashFrames.push(PIXI.Texture.fromFrame("pink-knight-slash-2.png"));
-
-
-			// TRAINING DUMMY
-
-			dummyIdleFrames = []; dummyHitFrames = [];
-
-			dummyIdleFrames.push(PIXI.Texture.fromFrame("dummy-stand.png"));
-			dummyIdleFrames.push(PIXI.Texture.fromFrame("dummy-stand.png"));
-
-			dummyHitFrames.push(PIXI.Texture.fromFrame("dummy-hit-1.png"));
-			dummyHitFrames.push(PIXI.Texture.fromFrame("dummy-hit-2.png"));
-
-			// PUMPKING
-
-			kingSleepFrames = []; kingWakeFrames = []; kingIdleFrames = [];
-
-			kingSleepFrames.push(PIXI.Texture.fromFrame("pumpking-sleep"));
-
-			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-1"));
-			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-2"));
-			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-3"));
-			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-4"));
-			kingWakeFrames.push(PIXI.Texture.fromFrame("pumpking-wake-5"));
-
-			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-1"));
-			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-2"));
-			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-3"));
-			kingIdleFrames.push(PIXI.Texture.fromFrame("pumpking-drip-4"));
-		}
-
-		/*
 		 *  setup
 		 *
 		 *  intitializes sprites, hitboxes, keyboard callbacks
 		 */
 		let activeScreen;
+		let player;
 
 		let tileGroup;
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
@@ -128,7 +69,6 @@
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
 			let kingTextures = PIXI.loader.resources["res/pumpkingdata.json"].textures;
-			buildAnimations();
 
 			activeScreen = {
 				stage: undefined,
@@ -136,131 +76,86 @@
 			};
 
 			hitBoxRenderer = new PIXI.Graphics();
-			renderHitboxes = true;
+			renderHitboxes = false;
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
 
-			bigdummySprite = new PIXI.extras.AnimatedSprite(kingSleepFrames);
-			bigdummySprite.animationSpeed = 0.1;
-			bigdummySprite.play();
-			bigdummySprite.y = 160;
-			bigdummySprite.x = 192;
-
-			dummySprite = new PIXI.extras.AnimatedSprite(dummyIdleFrames);
-			dummySprite.animationSpeed = 0.05;
-			dummySprite.play();
-			dummySprite.anchor.x = 0.5;
-			dummySprite.x = 96;
-			dummySprite.y = 324;
-
-			dummySprite.hitbox = {
-				x: dummySprite.x - dummySprite.width/6,
-				y: dummySprite.y + dummySprite.height/4,
-				width: dummySprite.width/3,
-				height: dummySprite.height/2,
-
-				halfWidth: dummySprite.width/6,
-				halfHeight: dummySprite.height/4,
-				centerX: dummySprite.x,
-				centerY: dummySprite.y + dummySprite.height/2
-			}
-
-			playerSprite = new PIXI.extras.AnimatedSprite(playerIdleFrames);
-			playerSprite.position.set(32, 320);
-			playerSprite.grounded = false;
-			playerSprite.centerX = playerSprite.x;
-			playerSprite.centerY = playerSprite.y + playerSprite.height / 2;
-			playerSprite.vx = 0;
-			playerSprite.vy = 0;
-
-			playerSprite.animationSpeed = 0.1;
-			playerSprite.play();
-
-			playerSprite.anchor.x = 0.5;
-
-			playerSprite.hitbox = {x: playerSprite.x - 16,
-								   y: playerSprite.y + 32,
-								   width: 32,
-								   height: 64};
-
-			playerSprite.weaponbox = 0;
-
-			let testEnemy = buildEnemy(enemy_nuttboy);
+			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 32, 384);
 
 			setActiveScreen(0);
 			renderer.render(activeScreen.stage);
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
-				playerSprite.scale.x = -1;
+				player.sprite.scale.x = -1;
 			}
 
 			keyObjectRight = keyboard(39);
 			keyObjectRight.press = function() {
-				playerSprite.scale.x = 1;
+				player.sprite.scale.x = 1;
 			}
 
 			keyObjectUp = keyboard(38);
 			keyObjectUp.press = function() {   
-				if (playerSprite.grounded) {
-					playerSprite.grounded = false;
-					playerSprite.vy = -5;
+				if (player.grounded) {
+					player.grounded = false;
+					player.sprite.vy = -5;
 				}
 			}
 
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
-				setAnimation(playerSprite, playerStabFrames, true);
-				playerSprite.animationSpeed = 0.05;
+				setAnimation(player.sprite, player.animations.stab, true);
+				player.sprite.animationSpeed = 0.05;
 
-				playerSprite.weaponbox = [{
-					offsetX: 6,
-					offsetY: 72,
+				player.weaponbox = [{
+					offsetX: 12,
+					offsetY: 0,
 
-					width: 32,
-					height: 16
-				}, {
-					offsetX: 20,
-					offsetY: 72,
+					width: 28,
+					height: 12
+				}, {  
+					offsetX: 22,
+					offsetY: 0,
 
-					width: 32,
-					height: 16,
+					width: 28,
+					height: 12,
 				}]
 			}
 			keyObjectZ.release = function() {
-				playerSprite.loop = false;
-				playerSprite.onComplete = function() {
-					setAnimation(playerSprite, playerIdleFrames);
-					playerSprite.animationSpeed = 0.1;
-					playerSprite.weaponbox = 0;
+				player.sprite.loop = false;
+				player.sprite.onComplete = function() {
+					setAnimation(player.sprite, player.animations.idle);
+					player.sprite.animationSpeed = 0.1;
+					player.weaponbox = 0;
 				}
 			}
 
 			keyObjectX = keyboard(88);
 			keyObjectX.press = function() {
-				setAnimation(playerSprite, playerSlashFrames, true);
-				playerSprite.animationSpeed = 0.05;
+				setAnimation(player.sprite, player.animations.slash, true);
+				player.sprite.animationSpeed = 0.05;
 
-				playerSprite.weaponbox = [{
+				player.weaponbox = [{
 					offsetX: 14,
-					offsetY: 32,
+					offsetY: -34,
 
-					width: 16,
-					height: 32
+					width: 14,
+					height: 22
 				}, {
-					offsetX: 20,
-					offsetY: 72,
+					offsetX: 22,
+					offsetY: 2,
 
-					width: 32,
-					height: 16,
+					width: 28,
+					height: 12,
 				}]
 			}
 			keyObjectX.release = function() {
-				playerSprite.loop = false;
-				playerSprite.onComplete = function() {
-					setAnimation(playerSprite, playerIdleFrames);
-					playerSprite.animationSpeed = 0.1;
-					playerSprite.weaponbox = 0;
+				player.sprite.loop = false;
+				player.sprite.onComplete = function() {
+					setAnimation(player.sprite, player.animations.idle);
+					player.sprite.animationSpeed = 0.1;
+					player.weaponbox = 0;
 				}
 			}
 
@@ -276,68 +171,60 @@
 				actor.textures = frames;
 				actor.gotoAndPlay(0);
 				actor.updateTexture();
-			}
+			} 
 
 			actor.loop = loop;
 		}
 
-		moveActor = function(Actor, dx, dy) {
-			Actor.x = Actor.x + dx;
-			Actor.y = Actor.y + dy;
-			Actor.centerX = Actor.centerX + dx;
-			Actor.centerY = Actor.centerY + dy;
+		moveActor = function(actor, dx, dy) {
+			actor.hitbox.centerX += dx;
+			actor.hitbox.centerY += dy;
 
-			if (Actor.hitbox) {
-				Actor.hitbox.x = Actor.hitbox.x + dx;
-				Actor.hitbox.y = Actor.hitbox.y + dy;
-				Actor.hitbox.centerX = Actor.hitbox.centerX + dx;
-				Actor.hitbox.centerY = Actor.hitbox.centerY + dy;
-			}
+			actor.sprite.x += dx;
+			actor.sprite.y += dy;
 		}
 
 		animatePlayer = function() {
-			if (playerSprite.weaponbox) {
+			if (player.weaponbox) {
 
 			} else {
-				if (playerSprite.grounded) {
-					if (playerSprite.vx === 0) setAnimation(playerSprite, playerIdleFrames);
-					else setAnimation(playerSprite, playerWalkFrames);
+				if (player.grounded) {
+					if (player.sprite.vx === 0) setAnimation(player.sprite, player.animations.idle);
+					else setAnimation(player.sprite, player.animations.walk);
 				} else {
-					setAnimation(playerSprite, playerJumpFrames);
+					setAnimation(player.sprite, player.animations.jump);
 				}
 			}
 		}
 
 		controlPlayer = function() {
-			if (playerSprite.grounded && playerSprite.weaponbox) {
-				playerSprite.vx = 0;
+			if (player.grounded && player.weaponbox) {
+				player.sprite.vx = 0;
 			} else {
 				if (keyObjectRight.isDown && !keyObjectLeft.isDown) {
-					playerSprite.vx = 2;
+					player.sprite.vx = 2;
 				} else if (keyObjectLeft.isDown && !keyObjectRight.isDown) {
-					playerSprite.vx = -2;
+					player.sprite.vx = -2;
 				} else {
-					playerSprite.vx = 0
+					player.sprite.vx = 0
 				}
 			}
 		}
 
 		buildWeaponbox = function(actor, weaponboxBase) {
-
 			let h = {
-				x: actor.x + weaponboxBase.offsetX * actor.scale.x,
-				y: actor.y + weaponboxBase.offsetY * actor.scale.y,
+				x: actor.sprite.position.x + weaponboxBase.offsetX * actor.sprite.scale.x,
+				y: actor.sprite.position.y + weaponboxBase.offsetY * actor.sprite.scale.y,
 
-				width: weaponboxBase.width * actor.scale.x,
-				height: weaponboxBase.height * actor.scale.y
+				width: weaponboxBase.width * actor.sprite.scale.x,
+				height: weaponboxBase.height * actor.sprite.scale.y
 			}
 
 			buildHitbox(h);
-
 			return h;
 		}
 
-		function buildStage(newScreen, enemies, player) {
+		function buildStage(newScreen, enemies, playerSprite) {
 			
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let stage = new Container()
@@ -348,12 +235,10 @@
 			stage.addChild(backgroundSprite);
 
 			enemies.forEach(function(enemy) {
-				console.log(enemy.sprite.x);
 				stage.addChild(enemy.sprite);
 			});
 
-			buildHitbox(playerSprite.hitbox);
-			stage.addChild(player);
+			stage.addChild(playerSprite);
 			
 			stage.addChild(getSpriteSet(tileTextures, newScreen.tiles));
 			stage.addChild(hitBoxRenderer);
@@ -365,20 +250,10 @@
 			let enemiesSrc = screens[key].enemies;
 			activeScreen.enemies = [];
 			enemiesSrc.forEach(function(enemy) {
-				bld = buildEnemy(enemy.name);
-				console.log("after build: " + enemy.position.x)
-				plc = placeEnemy(bld, enemy.position.x, enemy.position.y);
-				console.log("after place: " + plc.sprite.position.x)
-
-				activeScreen.enemies.push(plc);
+				activeScreen.enemies.push(spawnEnemy(buildEnemy(enemy.name), enemy.position.x, enemy.position.y));
 			});
 
-			//console.log(activeScreen.enemies)
-			activeScreen.enemies.forEach(function(enemy) {
-				console.log("sas " + enemy.sprite.position.x);
-			});
-
-			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, playerSprite);
+			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, player.sprite);
 
 		}
 
@@ -386,73 +261,75 @@
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
-			if (playerSprite.x < 0) {
+			if (player.sprite.x < 0) {
 
-				moveActor(playerSprite, 512, 0);
+				moveActor(player, 512, 0);
 				screen--;
 				
 				setActiveScreen(screen);
 			
-			} else if (playerSprite.x > 512) {
+			} else if (player.sprite.x > 512) {
 
-				moveActor(playerSprite, -512, 0);
+				moveActor(player, -512, 0);
 				screen++;
 
 				setActiveScreen(screen);
 			}
 
-			playerSprite.grounded = false;
-			moveActor(playerSprite, playerSprite.vx, playerSprite.vy);
+			player.grounded = false;
+			moveActor(player, player.sprite.vx, player.sprite.vy);
+
+			activeScreen.enemies.forEach(function(enemy) {
+				enemy.grounded = false;
+				moveActor(enemy, enemy.sprite.vx, enemy.sprite.vy);
+			});
 
 			let collisionList;
-			if (collisionList = getCollisions(playerSprite.hitbox, groundBoxes)) {
+			if (collisionList = getCollisions(player.hitbox, groundBoxes)) {
 				collisionList.forEach(function(collision) {
-					resolveCollision(playerSprite, collision);
+					resolveCollision(player, collision);
 				});
 			}
 
-			screens[screen].enemies.forEach(function(enemy) {
-				if (!enemy.grounded);
-			});
+			if (!player.grounded) player.sprite.vy += 0.2;
 
-			if (playerSprite.weaponbox) {
-				let activeWeaponbox = buildWeaponbox(playerSprite, playerSprite.weaponbox[playerSprite.currentFrame]);
-				if (collisionList = getCollisions(activeWeaponbox, [dummySprite.hitbox])) {
-					setAnimation(dummySprite, dummyHitFrames);
-					dummySprite.gotoAndPlay(1 - playerSprite.currentFrame);
-					dummySprite.updateTexture();
+			activeScreen.enemies.forEach(function(enemy) {
+				if (collisionList = getCollisions(enemy.hitbox, groundBoxes)) {
+					collisionList.forEach(function(collision) {
+						resolveCollision(enemy, collision);
+					});
 				}
-			} else {
-				setAnimation(dummySprite, dummyIdleFrames)
-			}
+
+				if (!enemy.grounded) enemy.sprite.vy += 0.2;
+				else enemy.sprite.vy = 0;
+			});
 
 			if (renderHitboxes) {
 				groundBoxes.forEach(function(box) {
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				});
 
-				hitBoxRenderer.drawRect(playerSprite.hitbox.x, playerSprite.hitbox.y, playerSprite.hitbox.width, playerSprite.hitbox.height);
-				if (playerSprite.weaponbox) {
-					let box = buildWeaponbox(playerSprite, playerSprite.weaponbox[playerSprite.currentFrame]);
+				drawHitbox(player.hitbox, hitBoxRenderer)
+				if (player.weaponbox) {
+					let box = buildWeaponbox(player, player.weaponbox[player.sprite.currentFrame]);
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				}
 
 				activeScreen.enemies.forEach(function(enemy) {
-					let box = enemy.hitbox;
-					hitBoxRenderer.drawRect(box.centerX - box.width/2, box.centerY - box.height/2, box.width, box.height);
+					drawHitbox(enemy.hitbox, hitBoxRenderer);
 				});
 			}
 
 			eventBoxes[screen].forEach(function(box) {
-				let collision = rectangleCollision(playerSprite.hitbox, box);
+				let collision = rectangleCollision(player.hitbox, box);
 				if (!box.playerPresent && collision) {
 					box.onPlayerEnter();
 				} else if (box.playerPresent && collision == undefined) {
 					box.playerPresent = false;
 				}
-			});
 
-			if (!playerSprite.grounded) playerSprite.vy += 0.2;
+				if (renderHitboxes) hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
+			});
 
 			controlPlayer();
 			animatePlayer();

@@ -43,11 +43,25 @@ rectangleCollision = function(r1, r2) {
 	if (side) return {side: side, overlap: overlap};
 }
 
+cloneHitbox = function(hitbox) {
+	return {
+		centerX: hitbox.centerX,
+		centerY: hitbox.centerY,
+
+		halfWidth: hitbox.halfWidth,
+		halfHeight: hitbox.halfHeight
+	}
+}
+
 buildHitbox = function(hitbox) {
-		hitbox.halfWidth = hitbox.width / 2;
-		hitbox.halfHeight = hitbox.height / 2;
-		hitbox.centerX = hitbox.x + hitbox.halfWidth;
-		hitbox.centerY = hitbox.y + hitbox.halfHeight;
+	hitbox.halfWidth = hitbox.width / 2;
+	hitbox.halfHeight = hitbox.height / 2;
+	hitbox.centerX = hitbox.x + hitbox.halfWidth;
+	hitbox.centerY = hitbox.y + hitbox.halfHeight;
+}
+
+drawHitbox = function(hitbox, renderer) {
+	renderer.drawRect(hitbox.centerX - hitbox.halfWidth, hitbox.centerY - hitbox.halfHeight, hitbox.halfWidth*2, hitbox.halfHeight*2);
 }
 
 getCollisions = function(hitbox, checkArray) {

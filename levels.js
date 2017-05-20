@@ -44,7 +44,7 @@ screenTiles = [
 
 screenBoxes = [
 
-	[{x: 0, y: 416, width: 224, height: 32},
+	[{x: -64, y: 416, width: 288, height: 32},
 	{x: 224, y: 352, width: 128, height: 96},
 	{x: 352, y: 288, width: 160, height: 96}],
 
@@ -54,7 +54,15 @@ screenBoxes = [
 ];
 
 eventBoxes = [
-	[],
+	[{
+		x: 128, y: 352, width: 96, height: 64,
+		playerPresent: false,
+		onPlayerEnter: function() {
+			walkEnemy(activeScreen.enemies[0], 2);
+
+			this.playerPresent = true;
+		}
+	}],
 
 	[{
 		x: 96, y: 384, width: 416, height: 32,
@@ -72,8 +80,7 @@ eventBoxes = [
 ];
 
 screenEnemies = [
-	[{name: enemy_nuttboy, position: {x: 128, y: 128}},
-	 {name: enemy_nuttboy, position: {x: 256, y: 128}}],
+	[{name: enemy_nuttboy, position: {x: 396, y: 256}}],
 
 	[]
 ]
