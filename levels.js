@@ -34,10 +34,10 @@ screenTiles = [
 	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT],
+	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT],
+	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
+	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
 	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
 
 ];
@@ -50,7 +50,9 @@ screenBoxes = [
 
 	[{x: 0, y: 288, width: 96, height: 128},
 	{x: 0, y: 416, width: 512, height: 32},
-	{x: 160, y: 352, width: 128, height: 64}]
+	{x: 160, y: 352, width: 128, height: 64},
+	{x: 352, y: 288, width: 160, height: 128},
+	{x: 416, y: 224, width: 96, height: 64}]
 
 ];
 
@@ -58,10 +60,15 @@ eventBoxes = [
 	[{
 		x: 128, y: 352, width: 96, height: 64,
 		playerPresent: false,
+
 		onPlayerEnter: function() {
 			walkEnemy(activeScreen.enemies[0], 2);
 
 			this.playerPresent = true;
+		},
+
+		onEnemyEnter: function(enemy) {
+
 		}
 	}],
 
@@ -71,7 +78,7 @@ eventBoxes = [
 screenEnemies = [
 	[{name: enemy_nuttboy, position: {x: 396, y: 256}}],
 
-	[]
+	[{name: enemy_nuttboy, position: {x: 340, y: 256}, spawnFunction(enemy) {walkEnemy(enemy, 2); jumpEnemy(enemy, -5)}}]
 ]
 
 screens = [

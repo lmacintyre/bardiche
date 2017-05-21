@@ -76,7 +76,7 @@
 			};
 
 			hitBoxRenderer = new PIXI.Graphics();
-			renderHitboxes = true;
+			renderHitboxes = false;
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
 
@@ -251,7 +251,12 @@
 			let enemiesSrc = screens[key].enemies;
 			activeScreen.enemies = [];
 			enemiesSrc.forEach(function(enemy) {
-				activeScreen.enemies.push(spawnEnemy(buildEnemy(enemy.name), enemy.position.x, enemy.position.y));
+				activeScreen.enemies.push(spawnEnemy(
+					buildEnemy(enemy.name),
+					enemy.position.x,
+					enemy.position.y,
+					enemy.spawnFunction
+				));
 			});
 
 			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, player.sprite);
