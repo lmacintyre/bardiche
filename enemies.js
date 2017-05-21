@@ -40,7 +40,7 @@ buildEnemy = function(enemy) {
 	return enemy;
 }
 
-spawnEnemy = function(enemy, x, y, facing="left") {
+spawnEnemy = function(enemy, x, y, spawnFunction=(e)=>{}, facing="left") {
 
 	enemy.hitbox.x = x - enemy.hitbox.width/2;
 	enemy.hitbox.y = y - enemy.hitbox.height/2;
@@ -67,6 +67,7 @@ spawnEnemy = function(enemy, x, y, facing="left") {
 	else spawn.sprite.scale.x = 1;
 
 	spawn.sprite.play();
+	spawnFunction(spawn);
 	return spawn;
 }
 

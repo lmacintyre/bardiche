@@ -36,8 +36,8 @@ screenTiles = [
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT],
+	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT],
 	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
 
 ];
@@ -49,7 +49,8 @@ screenBoxes = [
 	{x: 352, y: 288, width: 160, height: 96}],
 
 	[{x: 0, y: 288, width: 96, height: 128},
-	{x: 0, y: 416, width: 512, height: 32}]
+	{x: 0, y: 416, width: 512, height: 32},
+	{x: 160, y: 352, width: 128, height: 64}]
 
 ];
 
@@ -64,19 +65,7 @@ eventBoxes = [
 		}
 	}],
 
-	[{
-		x: 96, y: 384, width: 416, height: 32,
-		playerPresent: false,
-		onPlayerEnter: function() {
-			if (bigdummySprite.textures === kingSleepFrames) {
-				setAnimation(bigdummySprite, kingWakeFrames, false);
-				bigdummySprite.onComplete = function() {
-					setAnimation(bigdummySprite, kingIdleFrames);
-				}
-			}
-			this.playerPresent = true;
-		}
-	}]
+	[]
 ];
 
 screenEnemies = [

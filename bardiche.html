@@ -76,7 +76,7 @@
 			};
 
 			hitBoxRenderer = new PIXI.Graphics();
-			renderHitboxes = false;
+			renderHitboxes = true;
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
 
@@ -164,6 +164,7 @@
 					buildHitbox(box);
 				});
 			});
+
 		}
 
 		setAnimation = function(actor, frames, loop=true) {

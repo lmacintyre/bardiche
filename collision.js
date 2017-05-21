@@ -16,7 +16,6 @@ rectangleCollision = function(r1, r2) {
 	        overlapY = combinedHalfHeights - Math.abs(vy);
 
 	        if (overlapX >= overlapY) {
-
 	        	if (vy > 0) {
 	        		side = "top";
 	        		overlap = overlapY;
