@@ -90,7 +90,6 @@
 				if (player.sprite.scale.x === 1 && !player.grounded) player.sprite.vy -= 0.8;
 				player.sprite.scale.x = -1;
 				if (player.stuck) {
-					console.log("pressed and stuck")
 					player.stuck = false;
 					player.weaponbox = 0;
 				}
@@ -99,7 +98,11 @@
 			keyObjectRight = keyboard(39);
 			keyObjectRight.press = function() {
 				if (player.sprite.scale.x === -1 && !player.grounded) player.sprite.vy -= 0.8;
-				if (!player.stuck) player.sprite.scale.x = 1;
+				player.sprite.scale.x = 1;
+				if (player.stuck) {
+					player.stuck = false;
+					player.weaponbox = 0;
+				}
 			}
 
 			keyObjectUp = keyboard(38);
@@ -117,8 +120,17 @@
 
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
-				setAnimation(player.sprite, player.animations.stab, true);
-				player.weaponbox = player.weaponBoxes.stab;
+				if (player.grounded) {
+					setAnimation(player.sprite, player.animations.stab, true);
+					player.weaponbox = player.weaponBoxes.stab;
+				}
+				
+				else {
+					setAnimation(player.sprite, player.animations.lunge, true);
+					player.weaponbox = player.weaponBoxes.lunge;
+				}
+
+				
 			}
 			keyObjectZ.release = function() {
 				player.sprite.loop = false;
@@ -131,9 +143,17 @@
 
 			keyObjectX = keyboard(88);
 			keyObjectX.press = function() {
-				setAnimation(player.sprite, player.animations.slash, true);
+				if (player.grounded) {
+					setAnimation(player.sprite, player.animations.slash, true);
+					player.weaponbox = player.weaponBoxes.slash;
+				}
 
-				player.weaponbox = player.weaponBoxes.slash;
+				else {
+					setAnimation(player.sprite, player.animations.drill);
+					player.weaponbox = player.weaponBoxes.drill;
+				}
+
+				
 			}
 			keyObjectX.release = function() {
 				player.sprite.loop = false;
@@ -294,6 +314,7 @@
 
 			if (player.weaponbox) {
 				if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
+					player.sprite.loop = false;
 					player.sprite.onComplete = function() {
 						console.log(player.sprite.vy)
 						player.stuck = true;

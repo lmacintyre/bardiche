@@ -50,7 +50,9 @@ spawnEnemy = function(enemy, x, y, spawnFunction=(e)=>{}, facing="left") {
 	spawn = {
 		name: enemy.name,
 		hitbox: spawnHitbox,
-		animations: enemy.animations
+		animations: enemy.animations,
+
+		eventQueue: []
 	};
 
 	spawn.activeAnimation = spawn.animations.idle;

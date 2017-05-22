@@ -36,9 +36,33 @@ playerBase_pinkKnight = {
 			height: 12,
 		}],
 
-		jumpAttack: {
+		lunge: [{
+			offsetX: 26,
+			offsetY: -4,
 
-		}
+			width: 28,
+			height: 12
+		}, {  
+			offsetX: 30,
+			offsetY: -4,
+
+			width: 28,
+			height: 12,
+		}],
+
+		drill: [{
+			offsetX: -8,
+			offsetY: 24,
+
+			width: 16,
+			height: 16
+		}, {  
+			offsetX: -8,
+			offsetY: 24,
+
+			width: 16,
+			height: 16,
+		}]
 	},
 
 	frameIds: {
@@ -48,7 +72,8 @@ playerBase_pinkKnight = {
 
 		stab: ['pink-knight-stab-1', 'pink-knight-stab-2'],
 		slash: ['pink-knight-slash-1', 'pink-knight-slash-2'],
-		jumpAttack: ['pink-knight-jump-attack']
+		lunge: ['pink-knight-lunge-1', 'pink-knight-lunge-2'],
+		drill: ['pink-knight-drill-1', 'pink-knight-drill-2']
 	},
 
 	animations: {
@@ -59,7 +84,8 @@ playerBase_pinkKnight = {
 buildPlayer = function(playerBase) {
 
 	playerBase.animations.idle = []; playerBase.animations.walk = []; playerBase.animations.jump = [];
-	playerBase.animations.stab = []; playerBase.animations.slash = []; playerBase.animations.jumpAttack = [];
+	playerBase.animations.stab = []; playerBase.animations.slash = [];
+	playerBase.animations.lunge = []; playerBase.animations.drill = [];
 
 	playerBase.frameIds.idle.forEach(function(frame) {
 		playerBase.animations.idle.push(PIXI.Texture.fromFrame(frame));
@@ -81,8 +107,12 @@ buildPlayer = function(playerBase) {
 		playerBase.animations.slash.push(PIXI.Texture.fromFrame(frame));
 	});
 
-	playerBase.frameIds.jumpAttack.forEach(function(frame) {
-		playerBase.animations.jumpAttack.push(PIXI.Texture.fromFrame(frame));
+	playerBase.frameIds.lunge.forEach(function(frame) {
+		playerBase.animations.lunge.push(PIXI.Texture.fromFrame(frame));
+	});
+
+	playerBase.frameIds.drill.forEach(function(frame) {
+		playerBase.animations.drill.push(PIXI.Texture.fromFrame(frame));
 	});
 
 	return playerBase;

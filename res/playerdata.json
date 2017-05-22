@@ -63,7 +63,7 @@
 	"sourceSize": {"w":64,"h":64},
 	"pivot": {"x":0.5,"y":0.5}
 },
-"pink-knight-jump-attack":
+"pink-knight-lunge-1":
 {
 	"frame": {"x":448,"y":0,"w":64,"h":64},
 	"rotated": false,
@@ -72,7 +72,7 @@
 	"sourceSize": {"w":64,"h":64},
 	"pivot": {"x":0.5,"y":0.5}
 },
-"pink-knight-drill-1":
+"pink-knight-lunge-2":
 {
 	"frame": {"x":512,"y":0,"w":64,"h":64},
 	"rotated": false,
@@ -84,6 +84,15 @@
 "pink-knight-drill-1":
 {
 	"frame": {"x":576,"y":0,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"pink-knight-drill-2":
+{
+	"frame": {"x":640,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
