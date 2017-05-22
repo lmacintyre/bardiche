@@ -87,12 +87,19 @@
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
+				if (player.sprite.scale.x === 1 && !player.grounded) player.sprite.vy -= 0.8;
 				player.sprite.scale.x = -1;
+				if (player.stuck) {
+					console.log("pressed and stuck")
+					player.stuck = false;
+					player.weaponbox = 0;
+				}
 			}
 
 			keyObjectRight = keyboard(39);
 			keyObjectRight.press = function() {
-				player.sprite.scale.x = 1;
+				if (player.sprite.scale.x === -1 && !player.grounded) player.sprite.vy -= 0.8;
+				if (!player.stuck) player.sprite.scale.x = 1;
 			}
 
 			keyObjectUp = keyboard(38);
@@ -100,33 +107,24 @@
 				if (player.grounded) {
 					player.grounded = false;
 					player.sprite.vy = -5;
+				} else if (player.stuck) {
+					player.stuck = false;
+					player.sprite.vy = -5;
+
+					player.weaponbox = 0;
 				}
 			}
 
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
 				setAnimation(player.sprite, player.animations.stab, true);
-				player.sprite.animationSpeed = 0.05;
-
-				player.weaponbox = [{
-					offsetX: 12,
-					offsetY: 0,
-
-					width: 28,
-					height: 12
-				}, {  
-					offsetX: 22,
-					offsetY: 0,
-
-					width: 28,
-					height: 12,
-				}]
+				player.weaponbox = player.weaponBoxes.stab;
 			}
 			keyObjectZ.release = function() {
 				player.sprite.loop = false;
 				player.sprite.onComplete = function() {
 					setAnimation(player.sprite, player.animations.idle);
-					player.sprite.animationSpeed = 0.1;
+					player.stuck = false;
 					player.weaponbox = 0;
 				}
 			}
@@ -134,27 +132,14 @@
 			keyObjectX = keyboard(88);
 			keyObjectX.press = function() {
 				setAnimation(player.sprite, player.animations.slash, true);
-				player.sprite.animationSpeed = 0.05;
 
-				player.weaponbox = [{
-					offsetX: 14,
-					offsetY: -34,
-
-					width: 14,
-					height: 22
-				}, {
-					offsetX: 22,
-					offsetY: 2,
-
-					width: 28,
-					height: 12,
-				}]
+				player.weaponbox = player.weaponBoxes.slash;
 			}
 			keyObjectX.release = function() {
 				player.sprite.loop = false;
 				player.sprite.onComplete = function() {
 					setAnimation(player.sprite, player.animations.idle);
-					player.sprite.animationSpeed = 0.1;
+					player.stuck = false;
 					player.weaponbox = 0;
 				}
 			}
@@ -248,6 +233,7 @@
 		}
 
 		function setActiveScreen(key) {
+			screen = key;
 			let enemiesSrc = screens[key].enemies;
 			activeScreen.enemies = [];
 			enemiesSrc.forEach(function(enemy) {
@@ -283,7 +269,15 @@
 			}
 
 			player.grounded = false;
+			if (player.stuck) {
+				player.sprite.vx = 0;
+				player.sprite.vy = 0;
+			}
 			moveActor(player, player.sprite.vx, player.sprite.vy);
+
+			if (player.weaponbox) {
+				player.activeWeaponbox = buildWeaponbox(player, player.weaponbox[player.sprite.currentFrame]);
+			}
 
 			activeScreen.enemies.forEach(function(enemy) {
 				enemy.grounded = false;
@@ -297,7 +291,20 @@
 				});
 			}
 
-			if (!player.grounded) player.sprite.vy += 0.2;
+
+			if (player.weaponbox) {
+				if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
+					player.sprite.onComplete = function() {
+						console.log(player.sprite.vy)
+						player.stuck = true;
+					}
+				} else if (player.stuck) {
+					player.stuck = false;
+					player.weaponbox = 0;
+				}
+			}
+
+			if (!player.grounded && !player.stuck) player.sprite.vy += 0.2;
 
 			activeScreen.enemies.forEach(function(enemy) {
 				if (collisionList = getCollisions(enemy.hitbox, groundBoxes)) {
@@ -317,7 +324,7 @@
 
 				drawHitbox(player.hitbox, hitBoxRenderer)
 				if (player.weaponbox) {
-					let box = buildWeaponbox(player, player.weaponbox[player.sprite.currentFrame]);
+					let box = player.activeWeaponbox;
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				}
 

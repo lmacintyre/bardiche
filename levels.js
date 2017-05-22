@@ -34,11 +34,31 @@ screenTiles = [
 	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT],
-	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT],
-	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR],
+	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.CRN_IBL],
 	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
+	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]],
+
+	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
+	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
+	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
+	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]],
+
+	 [[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT],
+	 [tileEnum.CRN_ITL, tileEnum.CRN_OBR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OBL, tileEnum.CRN_ITR],
+	 [tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG],
+	 [tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG],
+	 [tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR],
 	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
+
+
 
 ];
 
@@ -46,13 +66,24 @@ screenBoxes = [
 
 	[{x: -64, y: 416, width: 288, height: 32},
 	{x: 224, y: 352, width: 128, height: 96},
-	{x: 352, y: 288, width: 160, height: 96}],
+	{x: 352, y: 288, width: 192, height: 160}],
 
-	[{x: 0, y: 288, width: 96, height: 128},
-	{x: 0, y: 416, width: 512, height: 32},
+	[{x: -32, y: 288, width: 128, height: 128},
+	{x: -32, y: 416, width: 544, height: 32},
 	{x: 160, y: 352, width: 128, height: 64},
-	{x: 352, y: 288, width: 160, height: 128},
-	{x: 416, y: 224, width: 96, height: 64}]
+	{x: 352, y: 352, width: 196, height: 64},
+	{x: 352, y: 288, width: 128, height: 64}],
+
+	[{x: -32, y: 352, width: 128, height: 64},
+	{x: -32, y: 416, width: 544, height: 32},
+	{x: 352, y: 224, width: 320, height: 192},
+	{x: 418, y: 160, width: 160, height: 64}],
+
+	[{x: -32, y: 160, width: 128, height: 64},
+	{x: 0, y: 416, width: 512, height: 32},
+	{x: 0, y: 224, width: 32, height: 192},
+	{x: 480, y: 224, width: 32, height: 192},
+	{x: 416, y: 160, width: 128, height: 64}]
 
 ];
 
@@ -65,12 +96,12 @@ eventBoxes = [
 			walkEnemy(activeScreen.enemies[0], 2);
 
 			this.playerPresent = true;
-		},
-
-		onEnemyEnter: function(enemy) {
-
 		}
 	}],
+
+	[],
+
+	[],
 
 	[]
 ];
@@ -78,7 +109,11 @@ eventBoxes = [
 screenEnemies = [
 	[{name: enemy_nuttboy, position: {x: 396, y: 256}}],
 
-	[{name: enemy_nuttboy, position: {x: 340, y: 256}, spawnFunction(enemy) {walkEnemy(enemy, 2); jumpEnemy(enemy, -5)}}]
+	[{name: enemy_nuttboy, position: {x: 396, y: 256}, spawnFunction(enemy) {walkEnemy(enemy, 2)}}],
+
+	[{name: enemy_nuttboy, position: {x: 380, y: 96}, spawnFunction(enemy) {walkEnemy(enemy, 2); jumpEnemy(enemy, -2)}}],
+
+	[{name: enemy_nuttboy, position: {x: 444, y: 128}, spawnFunction(enemy) {enemy.sprite.scale.x = -1}}]
 ]
 
 screens = [
@@ -95,6 +130,20 @@ screens = [
 		groundBoxes: screenBoxes[1],
 		eventBoxes: eventBoxes[1],
 		enemies: screenEnemies[1]
+	},
+
+	{
+		tiles: screenTiles[2],
+		groundBoxes: screenBoxes[2],
+		eventBoxes: eventBoxes[2],
+		enemies: screenEnemies[2]
+	},
+
+	{
+		tiles: screenTiles[3],
+		groundBoxes: screenBoxes[3],
+		eventBoxes: eventBoxes[3],
+		enemies: screenEnemies[3]
 	}
 
 ]

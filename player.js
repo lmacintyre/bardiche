@@ -7,6 +7,40 @@ playerBase_pinkKnight = {
 		height: 48
 	},
 
+	weaponBoxes: {
+		stab: [{
+			offsetX: 12,
+			offsetY: 0,
+
+			width: 28,
+			height: 12
+		}, {  
+			offsetX: 22,
+			offsetY: 0,
+
+			width: 28,
+			height: 12,
+		}],
+
+		slash: [{
+			offsetX: 14,
+			offsetY: -34,
+
+			width: 14,
+			height: 22
+		}, {
+			offsetX: 22,
+			offsetY: 2,
+
+			width: 28,
+			height: 12,
+		}],
+
+		jumpAttack: {
+
+		}
+	},
+
 	frameIds: {
 		idle: ['pink-knight-stand'],
 		walk: ['pink-knight-walk-1', 'pink-knight-walk-2'],
@@ -14,6 +48,7 @@ playerBase_pinkKnight = {
 
 		stab: ['pink-knight-stab-1', 'pink-knight-stab-2'],
 		slash: ['pink-knight-slash-1', 'pink-knight-slash-2'],
+		jumpAttack: ['pink-knight-jump-attack']
 	},
 
 	animations: {
@@ -24,7 +59,7 @@ playerBase_pinkKnight = {
 buildPlayer = function(playerBase) {
 
 	playerBase.animations.idle = []; playerBase.animations.walk = []; playerBase.animations.jump = [];
-	playerBase.animations.stab = []; playerBase.animations.slash = [];
+	playerBase.animations.stab = []; playerBase.animations.slash = []; playerBase.animations.jumpAttack = [];
 
 	playerBase.frameIds.idle.forEach(function(frame) {
 		playerBase.animations.idle.push(PIXI.Texture.fromFrame(frame));
@@ -46,6 +81,10 @@ buildPlayer = function(playerBase) {
 		playerBase.animations.slash.push(PIXI.Texture.fromFrame(frame));
 	});
 
+	playerBase.frameIds.jumpAttack.forEach(function(frame) {
+		playerBase.animations.jumpAttack.push(PIXI.Texture.fromFrame(frame));
+	});
+
 	return playerBase;
 }
 
@@ -58,6 +97,7 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn = {
 		name: playerBase.name,
 		hitbox: spawnHitbox,
+		weaponBoxes: playerBase.weaponBoxes,
 		animations: playerBase.animations
 	}
 
@@ -70,6 +110,7 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn.sprite.vx = 0;
 	spawn.sprite.vy = 0;
 	spawn.grounded = false;
+	spawn.stuck = false;
 
 	spawn.sprite.play();
 	return spawn;
