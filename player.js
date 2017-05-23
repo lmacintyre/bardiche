@@ -9,59 +9,43 @@ playerBase_pinkKnight = {
 
 	weaponBoxes: {
 		stab: [{
-			offsetX: 12,
-			offsetY: 0,
-
-			width: 28,
-			height: 12
-		}, {  
-			offsetX: 22,
-			offsetY: 0,
-
-			width: 28,
-			height: 12,
+			name: 'stab',
+			offsetX: 12, offsetY: -2,
+			width: 28, height: 12
+		}, {
+			name: 'stab',
+			offsetX: 22, offsetY: -2,
+			width: 28, height: 12,
 		}],
 
 		slash: [{
-			offsetX: 14,
-			offsetY: -34,
-
-			width: 14,
-			height: 22
+			name: 'slash',
+			offsetX: 14, offsetY: -36,
+			width: 14, height: 22
 		}, {
-			offsetX: 22,
-			offsetY: 2,
-
-			width: 28,
-			height: 12,
+			name: 'slash',
+			offsetX: 22, offsetY: 0,
+			width: 28, height: 12,
 		}],
 
 		lunge: [{
-			offsetX: 26,
-			offsetY: -4,
-
-			width: 28,
-			height: 12
-		}, {  
-			offsetX: 30,
-			offsetY: -4,
-
-			width: 28,
-			height: 12,
+			name: 'lunge',
+			offsetX: 26, offsetY: -4,
+			width: 28, height: 12
+		}, {
+			name: 'lunge',  
+			offsetX: 30, offsetY: -4,
+			width: 28, height: 12,
 		}],
 
 		drill: [{
-			offsetX: -8,
-			offsetY: 24,
-
-			width: 16,
-			height: 16
-		}, {  
-			offsetX: -8,
-			offsetY: 24,
-
-			width: 16,
-			height: 16,
+			name: 'drill',
+			offsetX: -8, offsetY: 24,
+			width: 16, height: 16
+		}, {
+			name: 'drill',  
+			offsetX: -8, offsetY: 24,
+			width: 16, height: 16,
 		}]
 	},
 
@@ -69,6 +53,7 @@ playerBase_pinkKnight = {
 		idle: ['pink-knight-stand'],
 		walk: ['pink-knight-walk-1', 'pink-knight-walk-2'],
 		jump: ['pink-knight-walk-2'],
+		damage: ['pink-knight-damage'],
 
 		stab: ['pink-knight-stab-1', 'pink-knight-stab-2'],
 		slash: ['pink-knight-slash-1', 'pink-knight-slash-2'],
@@ -83,7 +68,7 @@ playerBase_pinkKnight = {
 
 buildPlayer = function(playerBase) {
 
-	playerBase.animations.idle = []; playerBase.animations.walk = []; playerBase.animations.jump = [];
+	playerBase.animations.idle = []; playerBase.animations.walk = []; playerBase.animations.jump = []; playerBase.animations.damage = [];
 	playerBase.animations.stab = []; playerBase.animations.slash = [];
 	playerBase.animations.lunge = []; playerBase.animations.drill = [];
 
@@ -97,6 +82,10 @@ buildPlayer = function(playerBase) {
 
 	playerBase.frameIds.jump.forEach(function(frame) {
 		playerBase.animations.jump.push(PIXI.Texture.fromFrame(frame));
+	});
+
+	playerBase.frameIds.damage.forEach(function(frame) {
+		playerBase.animations.damage.push(PIXI.Texture.fromFrame(frame));
 	});
 
 	playerBase.frameIds.stab.forEach(function(frame) {
@@ -128,7 +117,9 @@ spawnPlayer = function(playerBase, x, y) {
 		name: playerBase.name,
 		hitbox: spawnHitbox,
 		weaponBoxes: playerBase.weaponBoxes,
-		animations: playerBase.animations
+		animations: playerBase.animations,
+
+		controlMode: 'free'
 	}
 
 	spawn.activeAnimation = spawn.animations.idle;
@@ -141,7 +132,24 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn.sprite.vy = 0;
 	spawn.grounded = false;
 	spawn.stuck = false;
+	spawn.vulnerable = true;
 
 	spawn.sprite.play();
 	return spawn;
+}
+
+damagePlayer = function(player, damage) {
+	player.controlMode = 'hit';
+	player.damageTimer = now;
+	player.grounded = false;
+	player.weaponbox = 0;
+	player.stuck = false;
+
+	setAnimation(player, player.animations.damage);
+	invlunerablePlayer(player);
+}
+
+invlunerablePlayer = function(player) {
+	player.vulnerable = false;
+	player.invulnTimer = now;
 }

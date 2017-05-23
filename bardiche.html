@@ -20,6 +20,11 @@
 
 	<script type="text/javascript">
 
+		// Timing
+		let now = Date.now();
+		let lastTime = now;
+		let timeSinceLastFrame = 0;
+
 		// Aliases
 		let Container = PIXI.Container,
 			autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -44,6 +49,8 @@
 			.add("res/pumpkingdata.json")
 			.add("res/nuttboydata.json")
 			.add("res/background.png")
+			.add("res/candlehouse.png")
+			.add("res/candles.png")
 			.load(setup);
 
 		// Set initial game state
@@ -82,55 +89,65 @@
 
 			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 32, 384);
 
-			setActiveScreen(0);
+			setActiveScreen(screen);
 			renderer.render(activeScreen.stage);
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
-				if (player.sprite.scale.x === 1 && !player.grounded) player.sprite.vy -= 0.8;
-				player.sprite.scale.x = -1;
-				if (player.stuck) {
-					player.stuck = false;
-					player.weaponbox = 0;
+				if (player.controlMode === 'free') {
+					if (player.weaponbox && player.activeWeaponbox.name ==='lunge') {
+						if (player.sprite.scale.x === 1 && !player.grounded) player.sprite.vy -= 0.8;
+					}
+					player.sprite.scale.x = -1;
+					if (player.stuck) {
+						player.stuck = false;
+						player.weaponbox = 0;
+					}
 				}
 			}
 
 			keyObjectRight = keyboard(39);
 			keyObjectRight.press = function() {
-				if (player.sprite.scale.x === -1 && !player.grounded) player.sprite.vy -= 0.8;
-				player.sprite.scale.x = 1;
-				if (player.stuck) {
-					player.stuck = false;
-					player.weaponbox = 0;
+				if (player.controlMode === 'free') {
+					if (player.weaponbox && player.activeWeaponbox.name ==='lunge') {
+						if (player.sprite.scale.x === -1 && !player.grounded) player.sprite.vy -= 0.8;
+					}
+					player.sprite.scale.x = 1;
+					if (player.stuck) {
+						player.stuck = false;
+						player.weaponbox = 0;
+					}
 				}
 			}
 
 			keyObjectUp = keyboard(38);
-			keyObjectUp.press = function() {   
-				if (player.grounded) {
-					player.grounded = false;
-					player.sprite.vy = -5;
-				} else if (player.stuck) {
-					player.stuck = false;
-					player.sprite.vy = -5;
+			keyObjectUp.press = function() {
+				if (player.controlMode === 'free') {
+					if (player.grounded) {
+						player.grounded = false;
+						player.sprite.vy = -5;
+					} else if (player.stuck) {
+						player.stuck = false;
+						player.sprite.vy = -5;
 
-					player.weaponbox = 0;
+						player.weaponbox = 0;
+					}
 				}
 			}
 
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
-				if (player.grounded) {
-					setAnimation(player.sprite, player.animations.stab, true);
-					player.weaponbox = player.weaponBoxes.stab;
-				}
-				
-				else {
-					setAnimation(player.sprite, player.animations.lunge, true);
-					player.weaponbox = player.weaponBoxes.lunge;
-				}
-
-				
+				if (player.controlMode === 'free') {
+					if (player.grounded) {
+						setAnimation(player.sprite, player.animations.stab, true);
+						player.weaponbox = player.weaponBoxes.stab;
+					}
+					
+					else {
+						setAnimation(player.sprite, player.animations.lunge, true);
+						player.weaponbox = player.weaponBoxes.lunge;
+					}
+				}				
 			}
 			keyObjectZ.release = function() {
 				player.sprite.loop = false;
@@ -143,17 +160,17 @@
 
 			keyObjectX = keyboard(88);
 			keyObjectX.press = function() {
-				if (player.grounded) {
-					setAnimation(player.sprite, player.animations.slash, true);
-					player.weaponbox = player.weaponBoxes.slash;
-				}
+				if (player.controlMode === 'free') {
+					if (player.grounded) {
+						setAnimation(player.sprite, player.animations.slash, true);
+						player.weaponbox = player.weaponBoxes.slash;
+					}
 
-				else {
-					setAnimation(player.sprite, player.animations.drill);
-					player.weaponbox = player.weaponBoxes.drill;
-				}
-
-				
+					else {
+						setAnimation(player.sprite, player.animations.drill);
+						player.weaponbox = player.weaponBoxes.drill;
+					}
+				}				
 			}
 			keyObjectX.release = function() {
 				player.sprite.loop = false;
@@ -191,34 +208,57 @@
 		}
 
 		animatePlayer = function() {
-			if (player.weaponbox) {
+			if (player.controlMode === 'free') {
+				if (player.weaponbox) {
 
-			} else {
-				if (player.grounded) {
-					if (player.sprite.vx === 0) setAnimation(player.sprite, player.animations.idle);
-					else setAnimation(player.sprite, player.animations.walk);
 				} else {
-					setAnimation(player.sprite, player.animations.jump);
+					if (player.grounded) {
+						if (player.sprite.vx === 0) setAnimation(player.sprite, player.animations.idle);
+						else setAnimation(player.sprite, player.animations.walk);
+					} else {
+						setAnimation(player.sprite, player.animations.jump);
+					}
 				}
+			} else if (player.controlMode === 'hit') {
+				setAnimation(player.sprite, player.animations.damage);
 			}
 		}
 
 		controlPlayer = function() {
-			if (player.grounded && player.weaponbox) {
-				player.sprite.vx = 0;
-			} else {
-				if (keyObjectRight.isDown && !keyObjectLeft.isDown) {
-					player.sprite.vx = 2;
-				} else if (keyObjectLeft.isDown && !keyObjectRight.isDown) {
-					player.sprite.vx = -2;
+			if (player.controlMode == 'free') {
+				if (player.grounded && player.weaponbox) {
+					player.sprite.vx = 0;
 				} else {
-					player.sprite.vx = 0
+					if (keyObjectRight.isDown && !keyObjectLeft.isDown) {
+						player.sprite.vx = 2;
+					} else if (keyObjectLeft.isDown && !keyObjectRight.isDown) {
+						player.sprite.vx = -2;
+					} else {
+						player.sprite.vx = 0
+					}
 				}
+			} else {
+				if (player.grounded) {
+					player.sprite.vx = 0;
+					player.controlMode = 'free';
+					setAnimation(player.sprite, player.animations.idle);
+				}
+
+				if (player.damageTimer < now - 1000) {
+					player.controlMode = 'free';
+					setAnimation(player.sprite, player.animations.idle);
+				}
+			}
+
+			if (player.vulnerable === false && player.invulnTimer < now - 1000) {
+				player.vulnerable = true;
 			}
 		}
 
 		buildWeaponbox = function(actor, weaponboxBase) {
 			let h = {
+				name: weaponboxBase.name,
+
 				x: actor.sprite.position.x + weaponboxBase.offsetX * actor.sprite.scale.x,
 				y: actor.sprite.position.y + weaponboxBase.offsetY * actor.sprite.scale.y,
 
@@ -230,7 +270,7 @@
 			return h;
 		}
 
-		function buildStage(newScreen, enemies, playerSprite) {
+		function buildStage(newScreen, enemies, playerSprite, scenery) {
 			
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let stage = new Container()
@@ -239,6 +279,14 @@
 			buildScreenBoxes(groundBoxes);
 			
 			stage.addChild(backgroundSprite);
+
+			scenery.forEach(function(item) {
+				console.log(item)
+				let decoration = new Sprite(resources[item.path].texture);
+				decoration.position.set(item.x, item.y);
+				decoration.scale.set(2, 2);
+				stage.addChild(decoration);
+			});
 
 			enemies.forEach(function(enemy) {
 				stage.addChild(enemy.sprite);
@@ -265,7 +313,7 @@
 				));
 			});
 
-			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, player.sprite);
+			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, player.sprite, screenDecorations[key]);
 
 		}
 
@@ -273,6 +321,7 @@
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
+			/* CHANGE SCREENS */
 			if (player.sprite.x < 0) {
 
 				moveActor(player, 512, 0);
@@ -293,39 +342,35 @@
 				player.sprite.vx = 0;
 				player.sprite.vy = 0;
 			}
+
+			/* MOVE ACTORS */
 			moveActor(player, player.sprite.vx, player.sprite.vy);
 
+			activeScreen.enemies.forEach(function(enemy) {
+				enemy.grounded = false;
+				moveActor(enemy, enemy.sprite.vx, enemy.sprite.vy);
+
+				manageEvent(enemy);
+			});
+
+			/* BUILD WEAPON HITBOXES */
 			if (player.weaponbox) {
 				player.activeWeaponbox = buildWeaponbox(player, player.weaponbox[player.sprite.currentFrame]);
 			}
 
 			activeScreen.enemies.forEach(function(enemy) {
-				enemy.grounded = false;
-				moveActor(enemy, enemy.sprite.vx, enemy.sprite.vy);
+				if (enemy.weaponbox) {
+					enemy.activeWeaponbox = buildWeaponbox(enemy, enemy.weaponbox[enemy.sprite.currentFrame]);
+				}
 			});
 
 			let collisionList;
+			/* GROUND CHECKS */
 			if (collisionList = getCollisions(player.hitbox, groundBoxes)) {
 				collisionList.forEach(function(collision) {
 					resolveCollision(player, collision);
 				});
 			}
-
-
-			if (player.weaponbox) {
-				if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
-					player.sprite.loop = false;
-					player.sprite.onComplete = function() {
-						console.log(player.sprite.vy)
-						player.stuck = true;
-					}
-				} else if (player.stuck) {
-					player.stuck = false;
-					player.weaponbox = 0;
-				}
-			}
-
-			if (!player.grounded && !player.stuck) player.sprite.vy += 0.2;
 
 			activeScreen.enemies.forEach(function(enemy) {
 				if (collisionList = getCollisions(enemy.hitbox, groundBoxes)) {
@@ -335,9 +380,103 @@
 				}
 
 				if (!enemy.grounded) enemy.sprite.vy += 0.2;
-				else enemy.sprite.vy = 0;
 			});
 
+			/* WEAPON CHECKS */
+			if (player.weaponbox) {
+				if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
+					player.sprite.loop = false;
+					player.sprite.onComplete = function() {
+						player.stuck = true;
+					}
+				} else if (player.stuck) {
+					player.stuck = false;
+					player.weaponbox = 0;
+				}
+
+				activeScreen.enemies.forEach(function(enemy) {
+					if (collisionList = getCollisions(player.activeWeaponbox, [enemy.hitbox])) {
+						if (player.activeWeaponbox.name === 'drill') {
+							player.sprite.vy = -1;
+							if (enemy.vulnerable) {
+								enemy.vulnerable = false;
+								enemy.sprite.vx = 0;
+								setAnimation(enemy.sprite, enemy.animations.walk, true);
+								pushEvent(enemy, {
+									run(enemy) {
+										setAnimation(enemy.sprite, enemy.animations.attack2, false);
+										enemy.weaponbox = 0;
+										enemy.sprite.onComplete = function() {
+											enemy.vulnerable = true;
+
+											nuttboyCharge(enemy, player);
+										}
+									},
+
+									delay: 250
+								});
+							}
+						}
+					}
+				});
+			}
+
+			activeScreen.enemies.forEach(function(enemy) {
+				if (enemy.weaponbox) {
+					if (enemy.activeWeaponbox.name === 'stab') {
+						if (collisionList = getCollisions(enemy.activeWeaponbox, groundBoxes)) {
+							setAnimation(enemy.sprite, enemy.animations.stuck);
+							enemy.weaponbox = 0;
+
+							pushEvent(enemy, {
+								run(enemy) {
+									setAnimation(enemy.sprite, enemy.animations.stuck, true);
+									enemy.sprite.vx = 0;
+								},
+
+								delay: 50
+							});
+
+							pushEvent(enemy, {
+								run(enemy) {
+									setAnimation(enemy.sprite, enemy.animations.attack2, false);
+									enemy.sprite.onComplete = function() {
+										setAnimation(enemy.sprite, enemy.animations.attack1);
+										enemy.sprite.scale.x = enemy.sprite.scale.x * -1;
+										enemy.sprite.vx = enemy.sprite.scale.x * 4;
+										enemy.weaponbox = enemy.weaponBoxes.attack1;
+									}
+								},
+
+								delay: 1000
+							});
+						}
+
+						if (player.vulnerable) {
+							if (collisionList = getCollisions(enemy.activeWeaponbox, [player.hitbox])) {
+								enemy.sprite.vx = 0;
+								damagePlayer(player, 1);
+								player.sprite.vx = enemy.sprite.scale.x * 5;
+								player.sprite.vy = -3;
+
+								enemy.eventQueue = [];
+								pushEvent(enemy, {
+									run(enemy) {
+										nuttboyCharge(enemy, player);
+									},
+
+									delay: 1000
+								});
+							}
+						}
+					}
+				}
+			});
+
+			/* GRAVITY */
+			if (!player.grounded && !player.stuck) player.sprite.vy += 0.2;
+
+			/* RENDER HITBOXES */
 			if (renderHitboxes) {
 				groundBoxes.forEach(function(box) {
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
@@ -351,28 +490,41 @@
 
 				activeScreen.enemies.forEach(function(enemy) {
 					drawHitbox(enemy.hitbox, hitBoxRenderer);
+
+					if (enemy.weaponbox) {
+						let box = enemy.activeWeaponbox;
+						hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
+					}
 				});
 			}
 
 			eventBoxes[screen].forEach(function(box) {
-				let collision = rectangleCollision(player.hitbox, box);
-				if (!box.playerPresent && collision) {
-					box.onPlayerEnter();
-				} else if (box.playerPresent && collision == undefined) {
-					box.playerPresent = false;
-				}
+				if (box.active) {
+					let collision = rectangleCollision(player.hitbox, box);
+					if (!box.playerPresent && collision) {
+						box.onPlayerEnter();
+					} else if (box.playerPresent && collision == undefined) {
+						box.playerPresent = false;
+					}
 
-				if (renderHitboxes) hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
+					if (renderHitboxes) hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
+				}
 			});
 
+			/* CONTROL AND ANIMATE PLAYER */
 			controlPlayer();
 			animatePlayer();
 		}
 
 		function gameLoop() {
+			now = Date.now();
+			timeSinceLastFrame = now - lastTime;
+
 			requestAnimationFrame(gameLoop);
 			state();
 			renderer.render(activeScreen.stage);
+
+			lastTime = now;
 		}
 
 		gameLoop();

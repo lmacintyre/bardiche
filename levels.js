@@ -58,9 +58,22 @@ screenTiles = [
 	 [tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR],
 	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
 
-
-
 ];
+
+screenDecorations = [
+
+	[
+		{ path: 'res/candlehouse.png', x: 64, y: 160 },
+		{ path: 'res/candles.png', x: 224, y: 224 }
+	],
+
+	[],
+
+	[],
+
+	[]
+
+]
 
 screenBoxes = [
 
@@ -71,8 +84,8 @@ screenBoxes = [
 	[{x: -32, y: 288, width: 128, height: 128},
 	{x: -32, y: 416, width: 544, height: 32},
 	{x: 160, y: 352, width: 128, height: 64},
-	{x: 352, y: 352, width: 196, height: 64},
-	{x: 352, y: 288, width: 128, height: 64}],
+	{x: 480, y: 352, width: 64, height: 64},
+	{x: 352, y: 288, width: 128, height: 128}],
 
 	[{x: -32, y: 352, width: 128, height: 64},
 	{x: -32, y: 416, width: 544, height: 32},
@@ -90,7 +103,7 @@ screenBoxes = [
 eventBoxes = [
 	[{
 		x: 128, y: 352, width: 96, height: 64,
-		playerPresent: false,
+		playerPresent: false, active: true,
 
 		onPlayerEnter: function() {
 			walkEnemy(activeScreen.enemies[0], 2);
@@ -103,17 +116,101 @@ eventBoxes = [
 
 	[],
 
-	[]
+	[{
+		x: 96, y: 160, width: 320, height: 32,
+		playerPresent: false, active: true,
+
+		onPlayerEnter: function() {
+			jumpEnemy(activeScreen.enemies[0], -4);
+			walkEnemy(activeScreen.enemies[0], -2);
+			pushEvent(activeScreen.enemies[0], {
+				run(enemy) {
+					walkEnemy(enemy, 0);
+				},
+
+				delay: 750
+			});
+
+			pushEvent(activeScreen.enemies[0], {
+				run(enemy) {
+					setAnimation(enemy.sprite, enemy.animations.attack1);
+					enemy.weaponbox = enemy.weaponBoxes.attack1;
+					enemy.sprite.vx = -4;
+				},
+
+				delay: 1000
+			});
+
+			this.playerPresent = true;
+			this.active = false;
+		}
+	}]
 ];
 
 screenEnemies = [
-	[{name: enemy_nuttboy, position: {x: 396, y: 256}}],
+	/* SCREEN 1 */
+	[
+		{
+			name: enemy_nuttboy,
+			position: {x: 396, y: 256}
+		}
+	],
 
-	[{name: enemy_nuttboy, position: {x: 396, y: 256}, spawnFunction(enemy) {walkEnemy(enemy, 2)}}],
+	/* SCREEN 2 */
+	[
+		{
+			name: enemy_nuttboy,
+			position: {x: 396, y: 256},
+			spawnFunction(enemy) {
+				pushEvent(enemy, {
+					run(enemy) {
+						walkEnemy(enemy, 2);
+					},
 
-	[{name: enemy_nuttboy, position: {x: 380, y: 96}, spawnFunction(enemy) {walkEnemy(enemy, 2); jumpEnemy(enemy, -2)}}],
+					delay: 1000
+				});
+			}
+		}
+	],
 
-	[{name: enemy_nuttboy, position: {x: 444, y: 128}, spawnFunction(enemy) {enemy.sprite.scale.x = -1}}]
+	/* SCREEN 3 */
+	[
+		{
+			name: enemy_nuttboy,
+			position: {x: 380, y: 96},
+			spawnFunction(enemy) {
+				walkEnemy(enemy, 2);
+				jumpEnemy(enemy, -2);
+				pushEvent(enemy, {
+					run(enemy) {
+						walkEnemy(enemy, 0);
+						enemy.sprite.scale.x = -1;
+					},
+
+					delay: 500
+				});
+
+				pushEvent(enemy, {
+					run(enemy) {
+						walkEnemy(enemy, 2);
+					},
+
+					delay: 1000
+				});
+			}
+		}
+	],
+
+	/* SCREEN 4 */
+	[
+		{
+			name: enemy_nuttboy,
+			position: {x: 444, y: 128},
+			spawnFunction(enemy) {
+				enemy.sprite.scale.x = -1;
+			}
+		}
+	]
 ]
 
 screens = [
