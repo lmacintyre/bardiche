@@ -181,6 +181,12 @@
 				}
 			}
 
+			keyObjectH = keyboard(72);
+			keyObjectH.press = function() {
+				renderHitboxes = renderHitboxes ? false : true;
+			}
+
+
 			eventBoxes.forEach(function(set) {
 				set.forEach(function(box) {
 					buildHitbox(box);
