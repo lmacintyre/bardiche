@@ -43,14 +43,19 @@
 		document.getElementById("container").appendChild(renderer.view);
 		
 		// Load spritesheets
-		loader.add("res/tiledata.json")
-			.add("res/playerdata.json")
-			.add("res/dummydata.json")
-			.add("res/pumpkingdata.json")
-			.add("res/nuttboydata.json")
-			.add("res/background.png")
-			.add("res/candlehouse.png")
-			.add("res/candles.png")
+		loader.add('res/tiledata.json')
+			.add('res/playerdata.json')
+			.add('res/dummydata.json')
+			.add('res/nuttboydata.json')
+			.add('res/hotwax.json')
+			.add('res/background.png')
+			.add('res/candlehouse.png')
+			.add('res/candlehouse-2.png')
+			.add('res/candles.png')
+			.add('res/candlewall.png')
+			.add('res/candlecorpses.png')
+			.add('res/bigcandle.png')
+			.add('res/stuck-weapons.png')
 			.load(setup);
 
 		// Set initial game state
@@ -72,15 +77,11 @@
 		let backgroundSprite;
 		function setup() {
 
+			let testWax = buildHazard(hazard_wax);
+
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
-			let kingTextures = PIXI.loader.resources["res/pumpkingdata.json"].textures;
-
-			activeScreen = {
-				stage: undefined,
-				enemies: []
-			};
 
 			hitBoxRenderer = new PIXI.Graphics();
 			renderHitboxes = false;
@@ -88,96 +89,68 @@
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
 
 			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 32, 384);
+			console.log(player);
 
+			activeScreen = {};
 			setActiveScreen(screen);
 			renderer.render(activeScreen.stage);
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
-				if (player.controlMode === 'free') {
-					if (player.weaponbox && player.activeWeaponbox.name ==='lunge') {
-						if (player.sprite.scale.x === 1 && !player.grounded) player.sprite.vy -= 0.8;
-					}
-					player.sprite.scale.x = -1;
-					if (player.stuck) {
-						player.stuck = false;
-						player.weaponbox = 0;
-					}
+				if (player.sprite.scale.x === 1 && keyObjectZ.isDown) {
+					player.sprite.vy -= 0.8;
+				}
+
+				if (player.controlMode === 'stuck') {
+					player.controlMode = 'free';
+					player.weaponbox = 0;
 				}
 			}
-
 			keyObjectRight = keyboard(39);
 			keyObjectRight.press = function() {
-				if (player.controlMode === 'free') {
-					if (player.weaponbox && player.activeWeaponbox.name ==='lunge') {
-						if (player.sprite.scale.x === -1 && !player.grounded) player.sprite.vy -= 0.8;
-					}
-					player.sprite.scale.x = 1;
-					if (player.stuck) {
-						player.stuck = false;
-						player.weaponbox = 0;
-					}
+				if (player.sprite.scale.x === -1 && keyObjectZ.isDown) {
+					player.sprite.vy -= 0.8;
 				}
-			}
 
-			keyObjectUp = keyboard(38);
-			keyObjectUp.press = function() {
-				if (player.controlMode === 'free') {
-					if (player.grounded) {
-						player.grounded = false;
-						player.sprite.vy = -5;
-					} else if (player.stuck) {
-						player.stuck = false;
-						player.sprite.vy = -5;
-
-						player.weaponbox = 0;
-					}
+				if (player.controlMode === 'stuck') {
+					player.controlMode = 'free';
+					player.weaponbox = 0;
 				}
 			}
 
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
 				if (player.controlMode === 'free') {
-					if (player.grounded) {
-						setAnimation(player.sprite, player.animations.stab, true);
-						player.weaponbox = player.weaponBoxes.stab;
-					}
-					
-					else {
-						setAnimation(player.sprite, player.animations.lunge, true);
-						player.weaponbox = player.weaponBoxes.lunge;
-					}
-				}				
+					console.log("RIGHT BEFORE")
+					if (player.grounded) attackPlayer(player, 'stab');
+					else attackPlayer(player, 'lunge');
+				}
 			}
 			keyObjectZ.release = function() {
-				player.sprite.loop = false;
-				player.sprite.onComplete = function() {
-					setAnimation(player.sprite, player.animations.idle);
-					player.stuck = false;
-					player.weaponbox = 0;
+				if (!keyObjectX.isDown) {
+					player.sprite.loop = false;
+					player.sprite.onComplete = function() {
+						player.controlMode = 'free';
+						setAnimation(player, player.animations.idle);
+						player.weaponbox = 0;
+					}
 				}
 			}
 
 			keyObjectX = keyboard(88);
 			keyObjectX.press = function() {
 				if (player.controlMode === 'free') {
-					if (player.grounded) {
-						setAnimation(player.sprite, player.animations.slash, true);
-						player.weaponbox = player.weaponBoxes.slash;
-					}
-
-					else {
-						setAnimation(player.sprite, player.animations.drill);
-						player.weaponbox = player.weaponBoxes.drill;
-					}
-				}				
+					if (player.grounded) attackPlayer(player, 'slash');
+					else attackPlayer(player, 'drill');
+				}
 			}
 			keyObjectX.release = function() {
-				player.sprite.loop = false;
-				player.sprite.onComplete = function() {
-					setAnimation(player.sprite, player.animations.idle);
-					player.stuck = false;
-					player.weaponbox = 0;
+				if (!keyObjectZ.isDown) {
+					player.sprite.loop = false;
+					player.sprite.onComplete = function() {
+						setAnimation(player, player.animations.idle);
+						player.weaponbox = 0;
+					}
 				}
 			}
 
@@ -192,17 +165,16 @@
 					buildHitbox(box);
 				});
 			});
-
 		}
 
 		setAnimation = function(actor, frames, loop=true) {
-			if (actor.textures != frames) {
-				actor.textures = frames;
-				actor.gotoAndPlay(0);
-				actor.updateTexture();
+			if (actor.sprite.textures != frames) {
+				actor.sprite.textures = frames;
+				actor.sprite.gotoAndPlay(0);
+				actor.sprite.updateTexture();
 			} 
 
-			actor.loop = loop;
+			actor.sprite.loop = loop;
 		}
 
 		moveActor = function(actor, dx, dy) {
@@ -219,41 +191,86 @@
 
 				} else {
 					if (player.grounded) {
-						if (player.sprite.vx === 0) setAnimation(player.sprite, player.animations.idle);
-						else setAnimation(player.sprite, player.animations.walk);
+						if (player.sprite.vx === 0) setAnimation(player, player.animations.idle);
+						else setAnimation(player, player.animations.walk);
 					} else {
-						setAnimation(player.sprite, player.animations.jump);
+						setAnimation(player, player.animations.jump);
 					}
 				}
 			} else if (player.controlMode === 'hit') {
-				setAnimation(player.sprite, player.animations.damage);
+				setAnimation(player, player.animations.damage);
+			}
+		}
+
+		turnPlayer = function() {
+			if (keyObjectLeft.isDown) {
+				player.sprite.scale.x = -1;
+
+			} else if (keyObjectRight.isDown) {
+				player.sprite.scale.x = 1;
+			}
+		}
+
+		walkPlayer = function() {
+			if (keyObjectRight.isDown || keyObjectLeft.isDown) {
+				//either left or right is pressed
+
+				if (!keyObjectLeft.isDown) {
+					//only right pressed
+					player.sprite.vx = 2;
+					
+				} else if (!keyObjectRight.isDown) {
+					//only left pressed
+					player.sprite.vx = -2;
+					
+				} else {
+					// Left and right pressed
+					player.sprite.vx = 0;
+
+				}
+			} else {
+				//neither left nor right pressed
+				player.sprite.vx = 0;
 			}
 		}
 
 		controlPlayer = function() {
-			if (player.controlMode == 'free') {
+			if (player.controlMode === 'free') {
 				if (player.grounded && player.weaponbox) {
 					player.sprite.vx = 0;
+
 				} else {
-					if (keyObjectRight.isDown && !keyObjectLeft.isDown) {
-						player.sprite.vx = 2;
-					} else if (keyObjectLeft.isDown && !keyObjectRight.isDown) {
-						player.sprite.vx = -2;
-					} else {
-						player.sprite.vx = 0
-					}
+					walkPlayer();
 				}
-			} else {
+
+				turnPlayer();
+
+			} else if (player.controlMode === 'hit') {
+
 				if (player.grounded) {
 					player.sprite.vx = 0;
 					player.controlMode = 'free';
-					setAnimation(player.sprite, player.animations.idle);
+					setAnimation(player, player.animations.idle);
 				}
 
 				if (player.damageTimer < now - 1000) {
 					player.controlMode = 'free';
-					setAnimation(player.sprite, player.animations.idle);
+					setAnimation(player, player.animations.idle);
 				}
+			} else if (player.controlMode === 'stuck') {
+				player.sprite.vx = 0;
+				player.sprite.vy = 0;
+
+			} else if (player.controlMode === 'attack') {
+				if (!player.grounded) {
+					walkPlayer();
+				}
+				if (!keyObjectX.isDown && !keyObjectZ.isDown) {
+					player.weaponbox = 0;
+					player.controlMode = 'free';
+				}
+
+				turnPlayer();
 			}
 
 			if (player.vulnerable === false && player.invulnTimer < now - 1000) {
@@ -276,7 +293,7 @@
 			return h;
 		}
 
-		function buildStage(newScreen, enemies, playerSprite, scenery) {
+		function buildStage(newScreen, enemies, hazards, playerSprite, scenery) {
 			
 			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
 			let stage = new Container()
@@ -287,7 +304,6 @@
 			stage.addChild(backgroundSprite);
 
 			scenery.forEach(function(item) {
-				console.log(item)
 				let decoration = new Sprite(resources[item.path].texture);
 				decoration.position.set(item.x, item.y);
 				decoration.scale.set(2, 2);
@@ -299,6 +315,10 @@
 			});
 
 			stage.addChild(playerSprite);
+
+			hazards.forEach(function(hazard) {
+				stage.addChild(hazard.sprite);
+			});
 			
 			stage.addChild(getSpriteSet(tileTextures, newScreen.tiles));
 			stage.addChild(hitBoxRenderer);
@@ -307,6 +327,7 @@
 		}
 
 		function setActiveScreen(key) {
+			console.log("sas")
 			screen = key;
 			let enemiesSrc = screens[key].enemies;
 			activeScreen.enemies = [];
@@ -319,7 +340,20 @@
 				));
 			});
 
-			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, player.sprite, screenDecorations[key]);
+			
+			let hazardsSrc = screens[key].hazards;
+			activeScreen.hazards = [];
+			hazardsSrc.forEach(function(hazard) {
+				activeScreen.hazards.push(spawnHazard(
+					buildHazard(hazard.name),
+					hazard.position.x,
+					hazard.position.y
+				));
+			});
+			console.log("DONE")
+
+			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, activeScreen.hazards, 
+				player.sprite, screenDecorations[key]);
 
 		}
 
@@ -330,10 +364,8 @@
 			/* CHANGE SCREENS */
 			if (player.sprite.x < 0) {
 
-				moveActor(player, 512, 0);
-				screen--;
-				
-				setActiveScreen(screen);
+				moveActor(player, player.sprite.x * -1, 0);
+				player.vx = 0;
 			
 			} else if (player.sprite.x > 512) {
 
@@ -344,10 +376,6 @@
 			}
 
 			player.grounded = false;
-			if (player.stuck) {
-				player.sprite.vx = 0;
-				player.sprite.vy = 0;
-			}
 
 			/* MOVE ACTORS */
 			moveActor(player, player.sprite.vx, player.sprite.vy);
@@ -393,34 +421,43 @@
 				if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
 					player.sprite.loop = false;
 					player.sprite.onComplete = function() {
-						player.stuck = true;
+						if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
+							player.controlMode = 'stuck';
+						} else {
+							player.sprite.loop = true;
+							player.sprite.gotoAndPlay(0);
+						}
 					}
-				} else if (player.stuck) {
-					player.stuck = false;
-					player.weaponbox = 0;
 				}
 
 				activeScreen.enemies.forEach(function(enemy) {
 					if (collisionList = getCollisions(player.activeWeaponbox, [enemy.hitbox])) {
 						if (player.activeWeaponbox.name === 'drill') {
-							player.sprite.vy = -1;
-							if (enemy.vulnerable) {
-								enemy.vulnerable = false;
-								enemy.sprite.vx = 0;
-								setAnimation(enemy.sprite, enemy.animations.walk, true);
-								pushEvent(enemy, {
-									run(enemy) {
-										setAnimation(enemy.sprite, enemy.animations.attack2, false);
-										enemy.weaponbox = 0;
-										enemy.sprite.onComplete = function() {
-											enemy.vulnerable = true;
+							if (enemy.active) {
+								if (player.sprite.vy > 3 && enemy.vulnerable) {
+									enemy.hitpoints -= player.sprite.vy;
+									if (enemy.hitpoints <= 0) nuttboyDie(enemy);
+								} else {
+									if (enemy.vulnerable) {
+										enemy.vulnerable = false;
+										enemy.sprite.vx = 0;
+										setAnimation(enemy, enemy.animations.walk, true);
+										pushEvent(enemy, {
+											run(enemy) {
+												nuttboySpikes(enemy);
+												enemy.sprite.onComplete = function() {
+													enemy.vulnerable = true;
 
-											nuttboyCharge(enemy, player);
-										}
-									},
+													nuttboyCharge(enemy, player);
+												}
+											},
 
-									delay: 250
-								});
+											delay: 250
+										});
+									}
+								}
+
+								player.sprite.vy = -1;
 							}
 						}
 					}
@@ -431,12 +468,12 @@
 				if (enemy.weaponbox) {
 					if (enemy.activeWeaponbox.name === 'stab') {
 						if (collisionList = getCollisions(enemy.activeWeaponbox, groundBoxes)) {
-							setAnimation(enemy.sprite, enemy.animations.stuck);
+							setAnimation(enemy, enemy.animations.stuck);
 							enemy.weaponbox = 0;
 
 							pushEvent(enemy, {
 								run(enemy) {
-									setAnimation(enemy.sprite, enemy.animations.stuck, true);
+									setAnimation(enemy, enemy.animations.stuck, true);
 									enemy.sprite.vx = 0;
 								},
 
@@ -445,12 +482,9 @@
 
 							pushEvent(enemy, {
 								run(enemy) {
-									setAnimation(enemy.sprite, enemy.animations.attack2, false);
+									nuttboySpikes(enemy);
 									enemy.sprite.onComplete = function() {
-										setAnimation(enemy.sprite, enemy.animations.attack1);
-										enemy.sprite.scale.x = enemy.sprite.scale.x * -1;
-										enemy.sprite.vx = enemy.sprite.scale.x * 4;
-										enemy.weaponbox = enemy.weaponBoxes.attack1;
+										nuttboyCharge(enemy, player);
 									}
 								},
 
@@ -464,6 +498,22 @@
 								damagePlayer(player, 1);
 								player.sprite.vx = enemy.sprite.scale.x * 5;
 								player.sprite.vy = -3;
+
+								enemy.eventQueue = [];
+								pushEvent(enemy, {
+									run(enemy) {
+										nuttboyCharge(enemy, player);
+									},
+
+									delay: 1000
+								});
+							}
+						}
+					} else if (enemy.activeWeaponbox.name === 'spikes') {
+						if (player.vulnerable) {
+							if (collisionList = getCollisions(enemy.activeWeaponbox, [player.hitbox])) {
+								damagePlayer(player, 1);
+								player.sprite.vy = -4;
 
 								enemy.eventQueue = [];
 								pushEvent(enemy, {

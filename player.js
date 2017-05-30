@@ -51,7 +51,7 @@ playerBase_pinkKnight = {
 
 	frameIds: {
 		idle: ['pink-knight-stand'],
-		walk: ['pink-knight-walk-1', 'pink-knight-walk-2'],
+		walk: ['pink-knight-walk-2', 'pink-knight-walk-1'],
 		jump: ['pink-knight-walk-2'],
 		damage: ['pink-knight-damage'],
 
@@ -131,8 +131,17 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn.sprite.vx = 0;
 	spawn.sprite.vy = 0;
 	spawn.grounded = false;
-	spawn.stuck = false;
 	spawn.vulnerable = true;
+
+	spawn.keyObjectUp = keyboard(38);
+	spawn.keyObjectUp.press = function() {
+		if (player.controlMode === 'stuck' || player.grounded) {
+			player.grounded = false;
+			player.controlMode = 'free';
+			player.weaponbox = 0;
+			player.sprite.vy = -5;
+		}
+	}
 
 	spawn.sprite.play();
 	return spawn;
@@ -143,7 +152,6 @@ damagePlayer = function(player, damage) {
 	player.damageTimer = now;
 	player.grounded = false;
 	player.weaponbox = 0;
-	player.stuck = false;
 
 	setAnimation(player, player.animations.damage);
 	invlunerablePlayer(player);
@@ -152,4 +160,9 @@ damagePlayer = function(player, damage) {
 invlunerablePlayer = function(player) {
 	player.vulnerable = false;
 	player.invulnTimer = now;
+}
+
+attackPlayer = function(player, attack) {
+	player.weaponbox = player.weaponBoxes[attack];
+	setAnimation(player, player.animations[attack]);
 }

@@ -63,15 +63,25 @@ screenTiles = [
 screenDecorations = [
 
 	[
-		{ path: 'res/candlehouse.png', x: 64, y: 160 },
+		{ path: 'res/candlehouse.png', x: 384, y: 32 },
+		{ path: 'res/candlewall.png', x: 0, y: 320 },
 		{ path: 'res/candles.png', x: 224, y: 224 }
 	],
 
-	[],
+	[
+		{ path: 'res/candles.png', x: -32, y: 160 },
+		{ path: 'res/candles.png', x: 166, y: 224 },
+		{ path: 'res/candles.png', x: 352, y: 160 }
+	],
 
-	[],
+	[
+		{ path: 'res/stuck-weapons.png', x: 256, y: 256 },
+		{ path: 'res/candlecorpses.png', x: 96, y: 320 }
+	],
 
-	[]
+	[
+		{ path: 'res/bigcandle.png', x: 128, y: 160 }
+	]
 
 ]
 
@@ -133,9 +143,7 @@ eventBoxes = [
 
 			pushEvent(activeScreen.enemies[0], {
 				run(enemy) {
-					setAnimation(enemy.sprite, enemy.animations.attack1);
-					enemy.weaponbox = enemy.weaponBoxes.attack1;
-					enemy.sprite.vx = -4;
+					nuttboyCharge(enemy, player);
 				},
 
 				delay: 1000
@@ -146,6 +154,26 @@ eventBoxes = [
 		}
 	}]
 ];
+
+screenHazards = [
+	[],
+
+	[
+		{
+			name: hazard_wax,
+			position: {x: 128, y: 384}
+		},
+
+		{
+			name: hazard_wax,
+			position: {x: 320, y: 384}
+		}
+	],
+
+	[],
+
+	[]
+]
 
 screenEnemies = [
 	/* SCREEN 1 */
@@ -219,6 +247,7 @@ screens = [
 		tiles: screenTiles[0],
 		groundBoxes: screenBoxes[0],
 		eventBoxes: eventBoxes[0],
+		hazards: screenHazards[0],
 		enemies: screenEnemies[0]
 	},
 
@@ -226,6 +255,7 @@ screens = [
 		tiles: screenTiles[1],
 		groundBoxes: screenBoxes[1],
 		eventBoxes: eventBoxes[1],
+		hazards: screenHazards[1],
 		enemies: screenEnemies[1]
 	},
 
@@ -233,6 +263,7 @@ screens = [
 		tiles: screenTiles[2],
 		groundBoxes: screenBoxes[2],
 		eventBoxes: eventBoxes[2],
+		hazards: screenHazards[2],
 		enemies: screenEnemies[2]
 	},
 
@@ -240,6 +271,7 @@ screens = [
 		tiles: screenTiles[3],
 		groundBoxes: screenBoxes[3],
 		eventBoxes: eventBoxes[3],
+		hazards: screenHazards[3],
 		enemies: screenEnemies[3]
 	}
 

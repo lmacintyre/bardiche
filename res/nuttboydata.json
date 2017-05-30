@@ -32,7 +32,7 @@
     "duration": 100
    },
    "nuttboy-stuck-1": {
-    "frame": { "x": 512, "y": 0, "w": 128, "h": 64 },
+    "frame": { "x": 0, "y": 64, "w": 128, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
@@ -40,7 +40,7 @@
     "duration": 100
    },
    "nuttboy-stuck-2": {
-    "frame": { "x": 640, "y": 0, "w": 128, "h": 64 },
+    "frame": { "x": 128, "y": 64, "w": 128, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
@@ -48,7 +48,7 @@
     "duration": 100
    },
    "nuttboy-spikes-1": {
-    "frame": { "x": 768, "y": 0, "w": 128, "h": 64 },
+    "frame": { "x": 0, "y": 128, "w": 128, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
@@ -56,7 +56,7 @@
     "duration": 100
    },
    "nuttboy-spikes-2": {
-    "frame": { "x": 896, "y": 0, "w": 128, "h": 64 },
+    "frame": { "x": 128, "y": 128, "w": 128, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
@@ -64,7 +64,47 @@
     "duration": 100
    },
    "nuttboy-spikes-3": {
-    "frame": { "x": 1024, "y": 0, "w": 128, "h": 64 },
+    "frame": { "x": 256, "y": 128, "w": 128, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
+    "sourceSize": { "w": 128, "h": 64 },
+    "duration": 100
+   },
+   "nuttboy-death-1": {
+    "frame": { "x": 0, "y": 192, "w": 128, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
+    "sourceSize": { "w": 128, "h": 64 },
+    "duration": 100
+   },
+   "nuttboy-death-2": {
+    "frame": { "x": 128, "y": 192, "w": 128, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
+    "sourceSize": { "w": 128, "h": 64 },
+    "duration": 100
+   },
+   "nuttboy-death-3": {
+    "frame": { "x": 256, "y": 192, "w": 128, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
+    "sourceSize": { "w": 128, "h": 64 },
+    "duration": 100
+   },
+   "nuttboy-death-4": {
+    "frame": { "x": 384, "y": 192, "w": 128, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
+    "sourceSize": { "w": 128, "h": 64 },
+    "duration": 100
+   },
+   "nuttboy-death-5": {
+    "frame": { "x": 512, "y": 192, "w": 128, "h": 64 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 128, "h": 64 },
