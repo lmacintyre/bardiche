@@ -58,7 +58,7 @@ playerBase_pinkKnight = {
 		stab: ['pink-knight-stab-1', 'pink-knight-stab-2'],
 		slash: ['pink-knight-slash-1', 'pink-knight-slash-2'],
 		lunge: ['pink-knight-lunge-1', 'pink-knight-lunge-2'],
-		drill: ['pink-knight-drill-1', 'pink-knight-drill-2']
+		drill: ['pink-knight-drill-2', 'pink-knight-drill-1']
 	},
 
 	animations: {
@@ -165,4 +165,18 @@ invlunerablePlayer = function(player) {
 attackPlayer = function(player, attack) {
 	player.weaponbox = player.weaponBoxes[attack];
 	setAnimation(player, player.animations[attack]);
+}
+
+playerStick = function(player, groundBoxes) {
+	if (checkAttackWall(player, groundBoxes)) {
+		player.sprite.loop = false;
+		player.sprite.onComplete = function() {
+			if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
+				player.controlMode = 'stuck';
+			} else {
+				player.sprite.loop = true;
+				player.sprite.gotoAndPlay(0);
+			}
+		}
+	}
 }

@@ -79,9 +79,7 @@ screenDecorations = [
 		{ path: 'res/candlecorpses.png', x: 96, y: 320 }
 	],
 
-	[
-		{ path: 'res/bigcandle.png', x: 128, y: 160 }
-	]
+	[]
 
 ]
 
@@ -131,9 +129,9 @@ eventBoxes = [
 		playerPresent: false, active: true,
 
 		onPlayerEnter: function() {
-			jumpEnemy(activeScreen.enemies[0], -4);
-			walkEnemy(activeScreen.enemies[0], -2);
-			pushEvent(activeScreen.enemies[0], {
+			jumpEnemy(activeScreen.enemies[1], -4);
+			walkEnemy(activeScreen.enemies[1], -2);
+			pushEvent(activeScreen.enemies[1], {
 				run(enemy) {
 					walkEnemy(enemy, 0);
 				},
@@ -141,7 +139,7 @@ eventBoxes = [
 				delay: 750
 			});
 
-			pushEvent(activeScreen.enemies[0], {
+			pushEvent(activeScreen.enemies[1], {
 				run(enemy) {
 					nuttboyCharge(enemy, player);
 				},
@@ -232,12 +230,53 @@ screenEnemies = [
 	/* SCREEN 4 */
 	[
 		{
+			name: enemy_tiamat,
+			position: {x: 256, y: 488},
+			spawnFunction(enemy) {
+				enemy.sprite.scale.x = 1;
+				setAnimation(enemy, enemy.animations.sleep)
+				enemy.colliding = false;
+			}
+		},
+
+		{
 			name: enemy_nuttboy,
 			position: {x: 444, y: 128},
 			spawnFunction(enemy) {
 				enemy.sprite.scale.x = -1;
+			},
+			deathFunction(enemy) {
+				let tiamat = activeScreen.enemies[0]
+				
+				pushEvent(tiamat, {
+					run(enemy) {
+						setAnimation(enemy, enemy.animations.light, false);
+						enemy.sprite.vy = -0.5;
+					},
+
+					delay: 1000
+				});
+
+				pushEvent(tiamat, {
+					run(enemy) {
+						setAnimation(enemy, enemy.animations.light, false);
+						enemy.sprite.vy = 0;
+					},
+
+					delay: 5000
+				});
+
+				pushEvent(tiamat, {
+					run(enemy) {
+						setAnimation(enemy, enemy.animations.idle, false);
+					},
+
+					delay: 2000
+				});
 			}
 		}
+
+
 	]
 ]
 

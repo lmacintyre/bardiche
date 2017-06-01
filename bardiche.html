@@ -47,9 +47,10 @@
 			.add('res/playerdata.json')
 			.add('res/dummydata.json')
 			.add('res/nuttboydata.json')
+			.add('res/waxtiamat.json')
 			.add('res/hotwax.json')
 			.add('res/background.png')
-			.add('res/candlehouse.png')
+			.add('res/candlehouse.png')    
 			.add('res/candlehouse-2.png')
 			.add('res/candles.png')
 			.add('res/candlewall.png')
@@ -89,11 +90,10 @@
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
 
 			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 32, 384);
-			console.log(player);
 
 			activeScreen = {};
 			setActiveScreen(screen);
-			renderer.render(activeScreen.stage);
+			renderer.render(activeScreen.stage);  
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
@@ -121,7 +121,6 @@
 			keyObjectZ = keyboard(90);
 			keyObjectZ.press = function() {
 				if (player.controlMode === 'free') {
-					console.log("RIGHT BEFORE")
 					if (player.grounded) attackPlayer(player, 'stab');
 					else attackPlayer(player, 'lunge');
 				}
@@ -326,8 +325,12 @@
 			return stage;
 		}
 
+		function checkAttackWall(actor, groundBoxes) {
+			if (collisionList = getCollisions(actor.activeWeaponbox, groundBoxes)) return true;
+			return false;
+		}
+
 		function setActiveScreen(key) {
-			console.log("sas")
 			screen = key;
 			let enemiesSrc = screens[key].enemies;
 			activeScreen.enemies = [];
@@ -336,7 +339,8 @@
 					buildEnemy(enemy.name),
 					enemy.position.x,
 					enemy.position.y,
-					enemy.spawnFunction
+					enemy.spawnFunction,
+					enemy.deathFunction
 				));
 			});
 
@@ -350,7 +354,6 @@
 					hazard.position.y
 				));
 			});
-			console.log("DONE")
 
 			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, activeScreen.hazards, 
 				player.sprite, screenDecorations[key]);
@@ -407,127 +410,33 @@
 			}
 
 			activeScreen.enemies.forEach(function(enemy) {
-				if (collisionList = getCollisions(enemy.hitbox, groundBoxes)) {
-					collisionList.forEach(function(collision) {
-						resolveCollision(enemy, collision);
-					});
+				if (enemy.colliding) {
+					if (collisionList = getCollisions(enemy.hitbox, groundBoxes)) {
+						collisionList.forEach(function(collision) {
+							resolveCollision(enemy, collision);
+						});
+					}
 				}
 
-				if (!enemy.grounded) enemy.sprite.vy += 0.2;
+				if (!enemy.grounded) enemy.sprite.vy += (0.2 * enemy.weight);
 			});
 
 			/* WEAPON CHECKS */
 			if (player.weaponbox) {
-				if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
-					player.sprite.loop = false;
-					player.sprite.onComplete = function() {
-						if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
-							player.controlMode = 'stuck';
-						} else {
-							player.sprite.loop = true;
-							player.sprite.gotoAndPlay(0);
-						}
-					}
-				}
+				playerStick(player, groundBoxes);
 
 				activeScreen.enemies.forEach(function(enemy) {
 					if (collisionList = getCollisions(player.activeWeaponbox, [enemy.hitbox])) {
-						if (player.activeWeaponbox.name === 'drill') {
-							if (enemy.active) {
-								if (player.sprite.vy > 3 && enemy.vulnerable) {
-									enemy.hitpoints -= player.sprite.vy;
-									if (enemy.hitpoints <= 0) nuttboyDie(enemy);
-								} else {
-									if (enemy.vulnerable) {
-										enemy.vulnerable = false;
-										enemy.sprite.vx = 0;
-										setAnimation(enemy, enemy.animations.walk, true);
-										pushEvent(enemy, {
-											run(enemy) {
-												nuttboySpikes(enemy);
-												enemy.sprite.onComplete = function() {
-													enemy.vulnerable = true;
+						enemy.onhit(player.activeWeaponbox.name, player.sprite.vy);
 
-													nuttboyCharge(enemy, player);
-												}
-											},
-
-											delay: 250
-										});
-									}
-								}
-
-								player.sprite.vy = -1;
-							}
+						if (enemy.active && player.activeWeaponbox.name === 'drill') {
+							player.sprite.vy = -2;
 						}
 					}
 				});
 			}
 
-			activeScreen.enemies.forEach(function(enemy) {
-				if (enemy.weaponbox) {
-					if (enemy.activeWeaponbox.name === 'stab') {
-						if (collisionList = getCollisions(enemy.activeWeaponbox, groundBoxes)) {
-							setAnimation(enemy, enemy.animations.stuck);
-							enemy.weaponbox = 0;
-
-							pushEvent(enemy, {
-								run(enemy) {
-									setAnimation(enemy, enemy.animations.stuck, true);
-									enemy.sprite.vx = 0;
-								},
-
-								delay: 50
-							});
-
-							pushEvent(enemy, {
-								run(enemy) {
-									nuttboySpikes(enemy);
-									enemy.sprite.onComplete = function() {
-										nuttboyCharge(enemy, player);
-									}
-								},
-
-								delay: 1000
-							});
-						}
-
-						if (player.vulnerable) {
-							if (collisionList = getCollisions(enemy.activeWeaponbox, [player.hitbox])) {
-								enemy.sprite.vx = 0;
-								damagePlayer(player, 1);
-								player.sprite.vx = enemy.sprite.scale.x * 5;
-								player.sprite.vy = -3;
-
-								enemy.eventQueue = [];
-								pushEvent(enemy, {
-									run(enemy) {
-										nuttboyCharge(enemy, player);
-									},
-
-									delay: 1000
-								});
-							}
-						}
-					} else if (enemy.activeWeaponbox.name === 'spikes') {
-						if (player.vulnerable) {
-							if (collisionList = getCollisions(enemy.activeWeaponbox, [player.hitbox])) {
-								damagePlayer(player, 1);
-								player.sprite.vy = -4;
-
-								enemy.eventQueue = [];
-								pushEvent(enemy, {
-									run(enemy) {
-										nuttboyCharge(enemy, player);
-									},
-
-									delay: 1000
-								});
-							}
-						}
-					}
-				}
-			});
+			activeScreen.enemies.forEach(function(enemy) {enemy.onstep()});
 
 			/* GRAVITY */
 			if (!player.grounded && !player.stuck) player.sprite.vy += 0.2;
