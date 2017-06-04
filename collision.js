@@ -94,3 +94,18 @@ resolveCollision = function(Actor, collision) {
 		moveActor(Actor, overlap * -1, 0);
 	} 
 }
+
+moveLine = function(L, x, y) {
+	L.p1.x += x; L.p1.y += y;
+	L.p2.x += x; L.p2.y += y;
+}
+
+linesCross = function(A, B) {
+	if (A.p1.x < B.p1.x || A.p1.x > B.p2.x) return undefined;
+	if (B.p1.y < A.p1.y || B.p1.y > A.p2.y) return undefined;
+
+	return {
+		side: 'bottom',
+		overlap: A.p2.y - B.p2.y
+	};
+}

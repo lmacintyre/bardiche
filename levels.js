@@ -2,82 +2,88 @@
 const tileEnum = {
 	FIL_AIR: 0,
 
-	STR_BOT: "bottom.png",
-	STR_TOP: "top.png",
-	STR_LEF: "left.png",
-	STR_RIG: "right.png",
+	STR_BOT: "bottom",
+	STR_TOP: "top",
+	STR_LEF: "left",
+	STR_RIG: "right",
 
-	CRN_ITR: "inside-tr.png",
-	CRN_ITL: "inside-tl.png",
-	CRN_IBR: "inside-br.png",
-	CRN_IBL: "inside-bl.png",
+	CRN_ITR: "inside-tr",
+	CRN_ITL: "inside-tl",
+	CRN_IBR: "inside-br",
+	CRN_IBL: "inside-bl",
 	
-	CRN_OTR: "outside-tr.png",
-	CRN_OTL: "outside-tl.png",
-	CRN_OBR: "outside-br.png",
-	CRN_OBL: "outside-bl.png",
+	CRN_OTR: "outside-tr",
+	CRN_OTL: "outside-tl",
+	CRN_OBR: "outside-br",
+	CRN_OBL: "outside-bl",
 
-	FIL_DRT: "fill.png"
+	FIL_DRT: "fill"
 };
 
 screenTiles = [
 
-	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.STR_BOT],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-	 [tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]],
+	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT]],
 
-	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR],
-	 [tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.CRN_IBL],
-	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]],
+	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR],
+	 [tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL],
+	 [tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR]],
 
-	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.CRN_IBR, tileEnum.FIL_DRT],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-	 [tileEnum.FIL_DRT, tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR, tileEnum.FIL_DRT, tileEnum.FIL_DRT],
-	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]],
+	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL],
+	 [tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR]],
 
-	 [[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL, tileEnum.STR_BOT],
-	 [tileEnum.CRN_ITL, tileEnum.CRN_OBR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OBL, tileEnum.CRN_ITR],
-	 [tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG],
-	 [tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.STR_RIG],
-	 [tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR],
-	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
+	[[tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT],
+	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
 
 ];
 
 screenDecorations = [
 
-	[
-		{ path: 'res/candlehouse.png', x: 384, y: 32 },
-		{ path: 'res/candlewall.png', x: 0, y: 320 },
-		{ path: 'res/candles.png', x: 224, y: 224 }
-	],
+	[{x:0, y:0, path: 'res/bigtree.png'}],
 
-	[
-		{ path: 'res/candles.png', x: -32, y: 160 },
-		{ path: 'res/candles.png', x: 166, y: 224 },
-		{ path: 'res/candles.png', x: 352, y: 160 }
-	],
+	[],
 
-	[
-		{ path: 'res/stuck-weapons.png', x: 256, y: 256 },
-		{ path: 'res/candlecorpses.png', x: 96, y: 320 }
-	],
+	[{x:0, y:0, path: 'res/goddess.png'}],
+
+	[]
+
+]
+
+screenPlatforms = [
+
+	[],
+
+	[{
+		tilesSrc: [
+			{x:0, y:3, id:tileEnum.STR_RIG},
+			{x:1, y:3, id:tileEnum.FIL_DRT},
+			{x:2, y:3, id:tileEnum.STR_LEF}
+		],
+
+		p1: {x: 64, y: 196},
+		p2: {x: 320, y: 196}
+	}],
+
+	[{
+		tilesSrc: [],
+
+		p1: {x: 226, y: 162},
+		p2: {x: 272, y: 162}
+	},
+
+	{
+		tilesSrc: [],
+
+		p1: {x: 282, y: 232},
+		p2: {x: 308, y: 232}
+	}],
 
 	[]
 
@@ -85,88 +91,33 @@ screenDecorations = [
 
 screenBoxes = [
 
-	[{x: -64, y: 416, width: 288, height: 32},
-	{x: 224, y: 352, width: 128, height: 96},
-	{x: 352, y: 288, width: 192, height: 160}],
+	[{x: -64, y: 448, width: 640, height: 32}],
 
-	[{x: -32, y: 288, width: 128, height: 128},
-	{x: -32, y: 416, width: 544, height: 32},
-	{x: 160, y: 352, width: 128, height: 64},
-	{x: 480, y: 352, width: 64, height: 64},
-	{x: 352, y: 288, width: 128, height: 128}],
+	[{x: -64, y: 448, width: 512, height: 32},
+	 {x: 448, y: 352, width: 64, height: 128}],
 
-	[{x: -32, y: 352, width: 128, height: 64},
-	{x: -32, y: 416, width: 544, height: 32},
-	{x: 352, y: 224, width: 320, height: 192},
-	{x: 418, y: 160, width: 160, height: 64}],
+	[{x: -64, y: 448, width: 640, height: 32},
+	 {x: -64, y: 352, width: 128, height: 128},
+	 {x: 448, y: 352, width: 64, height: 128}],
 
-	[{x: -32, y: 160, width: 128, height: 64},
-	{x: 0, y: 416, width: 512, height: 32},
-	{x: 0, y: 224, width: 32, height: 192},
-	{x: 480, y: 224, width: 32, height: 192},
-	{x: 416, y: 160, width: 128, height: 64}]
+	[{x: -64, y: 448, width: 640, height: 32}]
 
 ];
 
 eventBoxes = [
-	[{
-		x: 128, y: 352, width: 96, height: 64,
-		playerPresent: false, active: true,
-
-		onPlayerEnter: function() {
-			walkEnemy(activeScreen.enemies[0], 2);
-
-			this.playerPresent = true;
-		}
-	}],
+	[],
 
 	[],
 
 	[],
 
-	[{
-		x: 96, y: 160, width: 320, height: 32,
-		playerPresent: false, active: true,
-
-		onPlayerEnter: function() {
-			jumpEnemy(activeScreen.enemies[1], -4);
-			walkEnemy(activeScreen.enemies[1], -2);
-			pushEvent(activeScreen.enemies[1], {
-				run(enemy) {
-					walkEnemy(enemy, 0);
-				},
-
-				delay: 750
-			});
-
-			pushEvent(activeScreen.enemies[1], {
-				run(enemy) {
-					nuttboyCharge(enemy, player);
-				},
-
-				delay: 1000
-			});
-
-			this.playerPresent = true;
-			this.active = false;
-		}
-	}]
+	[]
 ];
 
 screenHazards = [
 	[],
 
-	[
-		{
-			name: hazard_wax,
-			position: {x: 128, y: 384}
-		},
-
-		{
-			name: hazard_wax,
-			position: {x: 320, y: 384}
-		}
-	],
+	[],
 
 	[],
 
@@ -175,109 +126,16 @@ screenHazards = [
 
 screenEnemies = [
 	/* SCREEN 1 */
-	[
-		{
-			name: enemy_nuttboy,
-			position: {x: 396, y: 256}
-		}
-	],
+	[],
 
 	/* SCREEN 2 */
-	[
-		{
-			name: enemy_nuttboy,
-			position: {x: 396, y: 256},
-			spawnFunction(enemy) {
-				pushEvent(enemy, {
-					run(enemy) {
-						walkEnemy(enemy, 2);
-					},
-
-					delay: 1000
-				});
-			}
-		}
-	],
+	[],
 
 	/* SCREEN 3 */
-	[
-		{
-			name: enemy_nuttboy,
-			position: {x: 380, y: 96},
-			spawnFunction(enemy) {
-				walkEnemy(enemy, 2);
-				jumpEnemy(enemy, -2);
-				pushEvent(enemy, {
-					run(enemy) {
-						walkEnemy(enemy, 0);
-						enemy.sprite.scale.x = -1;
-					},
-
-					delay: 500
-				});
-
-				pushEvent(enemy, {
-					run(enemy) {
-						walkEnemy(enemy, 2);
-					},
-
-					delay: 1000
-				});
-			}
-		}
-	],
+	[],
 
 	/* SCREEN 4 */
-	[
-		{
-			name: enemy_tiamat,
-			position: {x: 256, y: 488},
-			spawnFunction(enemy) {
-				enemy.sprite.scale.x = 1;
-				setAnimation(enemy, enemy.animations.sleep)
-				enemy.colliding = false;
-			}
-		},
-
-		{
-			name: enemy_nuttboy,
-			position: {x: 444, y: 128},
-			spawnFunction(enemy) {
-				enemy.sprite.scale.x = -1;
-			},
-			deathFunction(enemy) {
-				let tiamat = activeScreen.enemies[0]
-				
-				pushEvent(tiamat, {
-					run(enemy) {
-						setAnimation(enemy, enemy.animations.light, false);
-						enemy.sprite.vy = -0.5;
-					},
-
-					delay: 1000
-				});
-
-				pushEvent(tiamat, {
-					run(enemy) {
-						setAnimation(enemy, enemy.animations.light, false);
-						enemy.sprite.vy = 0;
-					},
-
-					delay: 5000
-				});
-
-				pushEvent(tiamat, {
-					run(enemy) {
-						setAnimation(enemy, enemy.animations.idle, false);
-					},
-
-					delay: 2000
-				});
-			}
-		}
-
-
-	]
+	[]
 ]
 
 screens = [
@@ -287,7 +145,8 @@ screens = [
 		groundBoxes: screenBoxes[0],
 		eventBoxes: eventBoxes[0],
 		hazards: screenHazards[0],
-		enemies: screenEnemies[0]
+		enemies: screenEnemies[0],
+		platforms: screenPlatforms[0]
 	},
 
 	{
@@ -295,7 +154,8 @@ screens = [
 		groundBoxes: screenBoxes[1],
 		eventBoxes: eventBoxes[1],
 		hazards: screenHazards[1],
-		enemies: screenEnemies[1]
+		enemies: screenEnemies[1],
+		platforms: screenPlatforms[1]
 	},
 
 	{
@@ -303,7 +163,8 @@ screens = [
 		groundBoxes: screenBoxes[2],
 		eventBoxes: eventBoxes[2],
 		hazards: screenHazards[2],
-		enemies: screenEnemies[2]
+		enemies: screenEnemies[2],
+		platforms: screenPlatforms[2]
 	},
 
 	{
@@ -311,7 +172,8 @@ screens = [
 		groundBoxes: screenBoxes[3],
 		eventBoxes: eventBoxes[3],
 		hazards: screenHazards[3],
-		enemies: screenEnemies[3]
+		enemies: screenEnemies[3],
+		platforms: screenPlatforms[3]
 	}
 
 ]
@@ -325,14 +187,29 @@ let getSpriteSet = function(tileset, screen) {
 			if (screen[i][j] != 0) {
 				let newTile = new Sprite(tileset[screen[i][j]]);
 
-				newTile.position.set(j*64, i*64);
+				newTile.position.set(j*128, i*128);
+				newTile.scale.set(2, 2);
 				tileGroup.addChild(newTile);
 			}
 			
 		}
 	}
-	
+
 	return tileGroup;
+}
+
+let setPlatformTiles = function(tileset, platform) {
+	let tileGroup = new Container();
+
+	platform.tilesSrc.forEach(function(tile) {
+		let newTile = new Sprite(tileset[tile.id]);
+
+		newTile.position.set(tile.x * 128, tile.y * 128);
+		newTile.scale.set(2, 2);
+		tileGroup.addChild(newTile);
+	});
+
+	platform.tileGroup = tileGroup;
 }
 
 let buildScreenBoxes = function(screenBoxes) {

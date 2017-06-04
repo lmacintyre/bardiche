@@ -7,6 +7,8 @@ playerBase_pinkKnight = {
 		height: 48
 	},
 
+	jumptimer: 0,
+
 	weaponBoxes: {
 		stab: [{
 			name: 'stab',
@@ -115,9 +117,17 @@ spawnPlayer = function(playerBase, x, y) {
 
 	spawn = {
 		name: playerBase.name,
+		
 		hitbox: spawnHitbox,
+		footLine: {
+			p1: {x: x, y: y + 14},
+			p2: {x: x, y: y + 24}
+		},
 		weaponBoxes: playerBase.weaponBoxes,
 		animations: playerBase.animations,
+
+		jumptimer: playerBase.jumptimer,
+		maxjumptimer: playerBase.jumptimer,
 
 		controlMode: 'free'
 	}
@@ -137,11 +147,17 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn.keyObjectUp.press = function() {
 		if (player.controlMode === 'stuck' || player.grounded) {
 			player.grounded = false;
+			player.jumptimer = player.maxjumptimer;
 			player.controlMode = 'free';
 			player.weaponbox = 0;
-			player.sprite.vy = -5;
+			player.sprite.vy = -6;
 		}
 	}
+	spawn.keyObjectUp.release = function() {
+		player.jumptimer = 0;
+	}
+
+	spawn.keyObjectDown = keyboard(40);
 
 	spawn.sprite.play();
 	return spawn;

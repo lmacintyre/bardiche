@@ -2,7 +2,7 @@
 
 "bottom.png":
 {
-	"frame": {"x":0,"y":0,"w":32,"h":32},
+	"frame": {"x":0,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -129,10 +129,10 @@
 "meta": {
 	"app": "http://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "tiledata.png",
+	"image": "grasstiles.png",
 	"format": "RGBA8888",
 	"size": {"w":448,"h":32},
-	"scale": "0.5",
+	"scale": "1",
 	"smartupdate": "$TexturePacker:SmartUpdate:04f0e0a5c9d76e85347977a927707dd0:464be3a83c18a4eacaa6fb586f82973f:bf2e98cfcf103f6d27230118f599d81f$"
 }
 }

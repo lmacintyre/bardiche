@@ -14,6 +14,7 @@
 	<script type="text/javascript" src="keyboard.js"></script>
 	<script type="text/javascript" src="collision.js"></script>
 
+	<script type="text/javascript" src="platform.js"></script>
 	<script type="text/javascript" src="player.js"></script>
 	<script type="text/javascript" src="enemies.js"></script>
 	<script type="text/javascript" src="levels.js"></script>
@@ -43,25 +44,17 @@
 		document.getElementById("container").appendChild(renderer.view);
 		
 		// Load spritesheets
-		loader.add('res/tiledata.json')
+		loader.add('res/grasstiles.json')
 			.add('res/playerdata.json')
-			.add('res/dummydata.json')
-			.add('res/nuttboydata.json')
-			.add('res/waxtiamat.json')
-			.add('res/hotwax.json')
+			.add('res/bigtree.png')
+			.add('res/goddess.png')
 			.add('res/background.png')
-			.add('res/candlehouse.png')    
-			.add('res/candlehouse-2.png')
-			.add('res/candles.png')
-			.add('res/candlewall.png')
-			.add('res/candlecorpses.png')
-			.add('res/bigcandle.png')
-			.add('res/stuck-weapons.png')
+			.add('res/cloudscroll.png')
 			.load(setup);
 
 		// Set initial game state
 		let state = play;
-		let screen = 0;
+		let screen = 2;
 
 		/*
 		 *  setup
@@ -76,24 +69,27 @@
 		let groundBoxes, hitBoxRenderer;
 		let renderHitboxes;
 		let backgroundSprite;
+		let cloudsSprite;
 		function setup() {
 
-			let testWax = buildHazard(hazard_wax);
-
-			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
+			let tileTextures = PIXI.loader.resources["res/grasstiles.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
-			let dummyTextures = PIXI.loader.resources["res/dummydata.json"].textures;
+
+			cloudsSprite = new PIXI.extras.TilingSprite(resources['res/cloudscroll.png'].texture, 256, 256);
+			cloudsSprite.scale.set(2, 2);
+			cloudsSprite.position.set(0, 0);
 
 			hitBoxRenderer = new PIXI.Graphics();
-			renderHitboxes = false;
+			renderHitboxes = true;
 
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
+			backgroundSprite.scale.set(2, 2);
 
 			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 32, 384);
 
 			activeScreen = {};
 			setActiveScreen(screen);
-			renderer.render(activeScreen.stage);  
+			renderer.render(activeScreen.stage); 
 
 			keyObjectLeft = keyboard(37);
 			keyObjectLeft.press = function() {
@@ -182,6 +178,8 @@
 
 			actor.sprite.x += dx;
 			actor.sprite.y += dy;
+
+			if (actor.footLine) moveLine(actor.footLine, dx, dy);
 		}
 
 		animatePlayer = function() {
@@ -294,13 +292,14 @@
 
 		function buildStage(newScreen, enemies, hazards, playerSprite, scenery) {
 			
-			let tileTextures = PIXI.loader.resources["res/tiledata.json"].textures;
+			let tileTextures = PIXI.loader.resources["res/grasstiles.json"].textures;
 			let stage = new Container()
 
 			groundBoxes = newScreen.groundBoxes;
 			buildScreenBoxes(groundBoxes);
 			
 			stage.addChild(backgroundSprite);
+			stage.addChild(cloudsSprite);
 
 			scenery.forEach(function(item) {
 				let decoration = new Sprite(resources[item.path].texture);
@@ -313,13 +312,19 @@
 				stage.addChild(enemy.sprite);
 			});
 
-			stage.addChild(playerSprite);
-
 			hazards.forEach(function(hazard) {
 				stage.addChild(hazard.sprite);
 			});
+
+			stage.addChild(playerSprite);
+
+			newScreen.platforms.forEach(function(platform) {
+				setPlatformTiles(tileTextures, platform);
+				stage.addChild(platform.tileGroup);
+			});
 			
 			stage.addChild(getSpriteSet(tileTextures, newScreen.tiles));
+			
 			stage.addChild(hitBoxRenderer);
 
 			return stage;
@@ -358,17 +363,24 @@
 			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, activeScreen.hazards, 
 				player.sprite, screenDecorations[key]);
 
+			activeScreen.platforms = screens[key].platforms;
+
 		}
 
 		function play() {
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
+			/* CLOUD SCROLL */
+			cloudsSprite.tilePosition.x -= 0.03;
+
 			/* CHANGE SCREENS */
 			if (player.sprite.x < 0) {
 
-				moveActor(player, player.sprite.x * -1, 0);
-				player.vx = 0;
+				moveActor(player, 512, 0);
+				screen--;
+
+				setActiveScreen(screen);
 			
 			} else if (player.sprite.x > 512) {
 
@@ -378,6 +390,7 @@
 				setActiveScreen(screen);
 			}
 
+			if (player.grounded) player.sprite.vy = 0.1;
 			player.grounded = false;
 
 			/* MOVE ACTORS */
@@ -401,8 +414,17 @@
 				}
 			});
 
-			let collisionList;
+			let collision, collisionList;
 			/* GROUND CHECKS */
+			if (!player.keyObjectDown.isDown && player.sprite.vy > 0) {
+				let collision;
+				activeScreen.platforms.forEach(function(platform) {
+					if (collision = linesCross(player.footLine, platform)) {
+						resolveCollision(player, collision);
+					}
+				});
+			}
+
 			if (collisionList = getCollisions(player.hitbox, groundBoxes)) {
 				collisionList.forEach(function(collision) {
 					resolveCollision(player, collision);
@@ -439,10 +461,26 @@
 			activeScreen.enemies.forEach(function(enemy) {enemy.onstep()});
 
 			/* GRAVITY */
-			if (!player.grounded && !player.stuck) player.sprite.vy += 0.2;
+			if (!player.grounded && !player.stuck) {
+				let t = player.jumptimer;
+
+				player.sprite.vy += 0.2 - 0.2 * (player.jumptimer/20);
+
+				if (player.jumptimer > 0) player.jumptimer--;
+
+			}
 
 			/* RENDER HITBOXES */
 			if (renderHitboxes) {
+
+				hitBoxRenderer.moveTo(player.footLine.p1.x, player.footLine.p1.y);
+				hitBoxRenderer.lineTo(player.footLine.p2.x, player.footLine.p2.y);
+
+				activeScreen.platforms.forEach(function(platform) {
+					hitBoxRenderer.moveTo(platform.p1.x, platform.p1.y);
+					hitBoxRenderer.lineTo(platform.p2.x, platform.p2.y);
+				});
+
 				groundBoxes.forEach(function(box) {
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				});
