@@ -50,11 +50,12 @@
 			.add('res/goddess.png')
 			.add('res/background.png')
 			.add('res/cloudscroll.png')
+			.add('res/marble.png')
 			.load(setup);
 
 		// Set initial game state
 		let state = play;
-		let screen = 2;
+		let screen = 1;
 
 		/*
 		 *  setup
@@ -71,7 +72,7 @@
 		let backgroundSprite;
 		let cloudsSprite;
 		function setup() {
-
+			
 			let tileTextures = PIXI.loader.resources["res/grasstiles.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 
@@ -214,11 +215,11 @@
 
 				if (!keyObjectLeft.isDown) {
 					//only right pressed
-					player.sprite.vx = 2;
+					player.sprite.vx = 3;
 					
 				} else if (!keyObjectRight.isDown) {
 					//only left pressed
-					player.sprite.vx = -2;
+					player.sprite.vx = -3;
 					
 				} else {
 					// Left and right pressed
@@ -364,7 +365,6 @@
 				player.sprite, screenDecorations[key]);
 
 			activeScreen.platforms = screens[key].platforms;
-
 		}
 
 		function play() {
@@ -420,6 +420,14 @@
 				let collision;
 				activeScreen.platforms.forEach(function(platform) {
 					if (collision = linesCross(player.footLine, platform)) {
+						if (platform.tileGroup.children.length > 0) {
+							
+							activeScreen.stage.removeChild(player.sprite);
+							activeScreen.stage.addChildAt(player.sprite, activeScreen.stage.getChildIndex(platform.tileGroup));
+
+							player.activePlatform = platform;
+						}
+
 						resolveCollision(player, collision);
 					}
 				});

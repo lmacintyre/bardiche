@@ -4,7 +4,7 @@ playerBase_pinkKnight = {
 
 	hitbox: {
 		width: 24,
-		height: 48
+		height: 110
 	},
 
 	jumptimer: 0,
@@ -53,13 +53,14 @@ playerBase_pinkKnight = {
 
 	frameIds: {
 		idle: ['pink-knight-stand'],
-		walk: ['pink-knight-walk-2', 'pink-knight-walk-1'],
-		jump: ['pink-knight-walk-2'],
+		walk: ['pink-knight-walk-1', 'pink-knight-walk-2', 'pink-knight-walk-3', 'pink-knight-walk-4',
+			   'pink-knight-walk-5', 'pink-knight-walk-6', 'pink-knight-walk-7', 'pink-knight-walk-8'],
+		jump: ['pink-knight-walk-8'],
 		damage: ['pink-knight-damage'],
 
 		stab: ['pink-knight-stab-1', 'pink-knight-stab-2'],
 		slash: ['pink-knight-slash-1', 'pink-knight-slash-2'],
-		lunge: ['pink-knight-lunge-1', 'pink-knight-lunge-2'],
+		lunge: ['pink-knight-lunge-1'],
 		drill: ['pink-knight-drill-2', 'pink-knight-drill-1']
 	},
 
@@ -70,40 +71,12 @@ playerBase_pinkKnight = {
 
 buildPlayer = function(playerBase) {
 
-	playerBase.animations.idle = []; playerBase.animations.walk = []; playerBase.animations.jump = []; playerBase.animations.damage = [];
-	playerBase.animations.stab = []; playerBase.animations.slash = [];
-	playerBase.animations.lunge = []; playerBase.animations.drill = [];
-
-	playerBase.frameIds.idle.forEach(function(frame) {
-		playerBase.animations.idle.push(PIXI.Texture.fromFrame(frame));
-	});
-
-	playerBase.frameIds.walk.forEach(function(frame) {
-		playerBase.animations.walk.push(PIXI.Texture.fromFrame(frame));
-	});
-
-	playerBase.frameIds.jump.forEach(function(frame) {
-		playerBase.animations.jump.push(PIXI.Texture.fromFrame(frame));
-	});
-
-	playerBase.frameIds.damage.forEach(function(frame) {
-		playerBase.animations.damage.push(PIXI.Texture.fromFrame(frame));
-	});
-
-	playerBase.frameIds.stab.forEach(function(frame) {
-		playerBase.animations.stab.push(PIXI.Texture.fromFrame(frame));
-	});
-
-	playerBase.frameIds.slash.forEach(function(frame) {
-		playerBase.animations.slash.push(PIXI.Texture.fromFrame(frame));
-	});
-
-	playerBase.frameIds.lunge.forEach(function(frame) {
-		playerBase.animations.lunge.push(PIXI.Texture.fromFrame(frame));
-	});
-
-	playerBase.frameIds.drill.forEach(function(frame) {
-		playerBase.animations.drill.push(PIXI.Texture.fromFrame(frame));
+	Object.keys(playerBase.frameIds).forEach(function(key) {
+		console.log(key);
+		playerBase.animations[key] = [];
+		playerBase.frameIds[key].forEach(function(frame) {
+			playerBase.animations[key].push(PIXI.Texture.fromFrame(frame));
+		});
 	});
 
 	return playerBase;
@@ -120,8 +93,8 @@ spawnPlayer = function(playerBase, x, y) {
 		
 		hitbox: spawnHitbox,
 		footLine: {
-			p1: {x: x, y: y + 14},
-			p2: {x: x, y: y + 24}
+			p1: {x: x, y: y + 45},
+			p2: {x: x, y: y + 55}
 		},
 		weaponBoxes: playerBase.weaponBoxes,
 		animations: playerBase.animations,
@@ -143,6 +116,8 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn.grounded = false;
 	spawn.vulnerable = true;
 
+	spawn.activePlatform = undefined;
+
 	spawn.keyObjectUp = keyboard(38);
 	spawn.keyObjectUp.press = function() {
 		if (player.controlMode === 'stuck' || player.grounded) {
@@ -150,7 +125,7 @@ spawnPlayer = function(playerBase, x, y) {
 			player.jumptimer = player.maxjumptimer;
 			player.controlMode = 'free';
 			player.weaponbox = 0;
-			player.sprite.vy = -6;
+			player.sprite.vy = -8;
 		}
 	}
 	spawn.keyObjectUp.release = function() {
@@ -158,6 +133,15 @@ spawnPlayer = function(playerBase, x, y) {
 	}
 
 	spawn.keyObjectDown = keyboard(40);
+	spawn.keyObjectDown.press = function() {
+		if (player.activePlatform) {
+			
+			activeScreen.stage.removeChild(player.sprite);
+			activeScreen.stage.addChildAt(player.sprite, activeScreen.stage.getChildIndex(player.activePlatform.tileGroup) + 1);
+
+			player.activePlatform = undefined;
+		}
+	}
 
 	spawn.sprite.play();
 	return spawn;

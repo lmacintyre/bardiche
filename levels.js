@@ -25,22 +25,22 @@ screenTiles = [
 	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT]],
-
-	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.CRN_OTL, tileEnum.STR_BOT, tileEnum.CRN_OTR, tileEnum.FIL_AIR],
-	 [tileEnum.STR_RIG, tileEnum.FIL_DRT, tileEnum.STR_LEF, tileEnum.CRN_OTL],
-	 [tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR]],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR]],
 
 	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
 	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.CRN_OTR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.CRN_OTL],
-	 [tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.CRN_IBR]],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR]],
 
-	[[tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.STR_LEF, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
-	 [tileEnum.CRN_IBL, tileEnum.STR_BOT, tileEnum.STR_BOT, tileEnum.STR_BOT],
-	 [tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT, tileEnum.FIL_DRT]]
+	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR]],
+
+	[[tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR],
+	 [tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR, tileEnum.FIL_AIR]]
 
 ];
 
@@ -50,7 +50,8 @@ screenDecorations = [
 
 	[],
 
-	[{x:0, y:0, path: 'res/goddess.png'}],
+	[{x:0, y:0, path: 'res/marble.png'},
+	 {x:0, y:0, path: 'res/goddess.png'}],
 
 	[]
 
@@ -58,20 +59,109 @@ screenDecorations = [
 
 screenPlatforms = [
 
-	[],
-
+	/* SCREEN 1 */
 	[{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:0, y:3, id:tileEnum.STR_BOT},
+			{x:1, y:3, id:tileEnum.STR_BOT},
+			{x:2, y:3, id:tileEnum.STR_BOT},
+			{x:3, y:3, id:tileEnum.STR_BOT}
+		],
+
+		p1: {x: 0, y: 456},
+		p2: {x: 512, y: 456}
+	}],
+
+	/* SCREEN 2 */
+	[{
+		type: 'platform',
+
 		tilesSrc: [
 			{x:0, y:3, id:tileEnum.STR_RIG},
 			{x:1, y:3, id:tileEnum.FIL_DRT},
-			{x:2, y:3, id:tileEnum.STR_LEF}
+			{x:2, y:3, id:tileEnum.STR_LEF},
+			{x:0, y:2, id:tileEnum.STR_RIG},
+			{x:1, y:2, id:tileEnum.FIL_DRT},
+			{x:2, y:2, id:tileEnum.STR_LEF},
+			{x:0, y:1, id:tileEnum.CRN_OTL},
+			{x:1, y:1, id:tileEnum.STR_BOT},
+			{x:2, y:1, id:tileEnum.CRN_OTR}
 		],
 
 		p1: {x: 64, y: 196},
 		p2: {x: 320, y: 196}
+	},
+
+	{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:3, y:2, id:tileEnum.CRN_OTL},
+			{x:3, y:3, id:tileEnum.STR_RIG}
+		],
+
+		p1: {x: 456, y: 320},
+		p2: {x: 512, y: 320}
+	},
+
+	{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:0, y:3, id:tileEnum.STR_BOT},
+			{x:1, y:3, id:tileEnum.STR_BOT},
+			{x:2, y:3, id:tileEnum.STR_BOT},
+			{x:3, y:3, id:tileEnum.STR_BOT}
+		],
+
+		p1: {x: 0, y: 456},
+		p2: {x: 512, y: 456}
 	}],
 
+	/* SCREEN 3 */
 	[{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:3, y:2, id:tileEnum.CRN_OTL},
+			{x:3, y:3, id:tileEnum.STR_RIG}
+		],
+
+		p1: {x: 456, y: 320},
+		p2: {x: 512, y: 320}
+	},
+
+	{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:0, y:2, id:tileEnum.CRN_OTR},
+			{x:0, y:3, id:tileEnum.STR_LEF}
+		],
+
+		p1: {x: 0, y: 320},
+		p2: {x: 64, y: 320}
+	},
+
+	{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:0, y:3, id:tileEnum.STR_BOT},
+			{x:1, y:3, id:tileEnum.STR_BOT},
+			{x:2, y:3, id:tileEnum.STR_BOT},
+			{x:3, y:3, id:tileEnum.STR_BOT}
+		],
+
+		p1: {x: 0, y: 456},
+		p2: {x: 512, y: 456}
+	},
+
+	{
+		type: 'platform',
+
 		tilesSrc: [],
 
 		p1: {x: 226, y: 162},
@@ -79,28 +169,57 @@ screenPlatforms = [
 	},
 
 	{
+		type: 'platform',
+
 		tilesSrc: [],
 
 		p1: {x: 282, y: 232},
 		p2: {x: 308, y: 232}
 	}],
 
-	[]
+	/* SCREEN 4 */
+	[{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:0, y:2, id:tileEnum.STR_BOT},
+			{x:1, y:2, id:tileEnum.STR_BOT},
+			{x:2, y:2, id:tileEnum.CRN_OTR},
+			{x:0, y:3, id:tileEnum.FIL_DRT},
+			{x:1, y:3, id:tileEnum.FIL_DRT},
+			{x:2, y:3, id:tileEnum.STR_LEF}
+		],
+
+		p1: {x: 0, y: 320},
+		p2: {x: 320, y: 320}
+
+	},
+
+	{
+		type: 'platform',
+
+		tilesSrc: [
+			{x:0, y:3, id:tileEnum.STR_BOT},
+			{x:1, y:3, id:tileEnum.STR_BOT},
+			{x:2, y:3, id:tileEnum.STR_BOT},
+			{x:3, y:3, id:tileEnum.STR_BOT}
+		],
+
+		p1: {x: 0, y: 456},
+		p2: {x: 512, y: 456}
+	}]
 
 ]
 
 screenBoxes = [
 
-	[{x: -64, y: 448, width: 640, height: 32}],
+	[],
 
-	[{x: -64, y: 448, width: 512, height: 32},
-	 {x: 448, y: 352, width: 64, height: 128}],
+	[],
 
-	[{x: -64, y: 448, width: 640, height: 32},
-	 {x: -64, y: 352, width: 128, height: 128},
-	 {x: 448, y: 352, width: 64, height: 128}],
+	[],
 
-	[{x: -64, y: 448, width: 640, height: 32}]
+	[]
 
 ];
 
