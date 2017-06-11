@@ -7,7 +7,7 @@ playerBase_pinkKnight = {
 		height: 110
 	},
 
-	jumptimer: 0,
+	jumptimer: 20,
 
 	weaponBoxes: {
 		stab: [{
@@ -72,7 +72,6 @@ playerBase_pinkKnight = {
 buildPlayer = function(playerBase) {
 
 	Object.keys(playerBase.frameIds).forEach(function(key) {
-		console.log(key);
 		playerBase.animations[key] = [];
 		playerBase.frameIds[key].forEach(function(frame) {
 			playerBase.animations[key].push(PIXI.Texture.fromFrame(frame));
@@ -102,7 +101,26 @@ spawnPlayer = function(playerBase, x, y) {
 		jumptimer: playerBase.jumptimer,
 		maxjumptimer: playerBase.jumptimer,
 
-		controlMode: 'free'
+		controlMode: 'free',
+
+		resolveCollision(collision) {
+
+			let side = collision.side, overlap = collision.overlap;
+
+			if (side == "top") {
+				movePlayer(this, activeScreen.platforms, 0, overlap);
+
+			} else if (side == "bottom") {
+				movePlayer(this, activeScreen.platforms, 0, overlap * -1);
+				this.grounded = true;
+
+			} else if (side == "left") {
+				movePlayer(this, activeScreen.platforms, overlap, 0);
+
+			} else if (side == "right") {
+				movePlayer(this, activeScreen.platforms, overlap * -1, 0);
+			}
+		}
 	}
 
 	spawn.activeAnimation = spawn.animations.idle;
@@ -125,7 +143,7 @@ spawnPlayer = function(playerBase, x, y) {
 			player.jumptimer = player.maxjumptimer;
 			player.controlMode = 'free';
 			player.weaponbox = 0;
-			player.sprite.vy = -8;
+			player.sprite.vy = -6;
 		}
 	}
 	spawn.keyObjectUp.release = function() {
@@ -135,16 +153,28 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn.keyObjectDown = keyboard(40);
 	spawn.keyObjectDown.press = function() {
 		if (player.activePlatform) {
-			
-			activeScreen.stage.removeChild(player.sprite);
-			activeScreen.stage.addChildAt(player.sprite, activeScreen.stage.getChildIndex(player.activePlatform.tileGroup) + 1);
+			if (player.activePlatform.type === 'platform') {
+				console.log('drop it')
+				activeScreen.stage.removeChild(player.sprite);
+				activeScreen.stage.addChildAt(player.sprite, activeScreen.stage.getChildIndex(player.activePlatform.tileGroup) + 1);
 
-			player.activePlatform = undefined;
+				player.activePlatform = undefined;
+			}
 		}
 	}
 
 	spawn.sprite.play();
 	return spawn;
+}
+
+movePlayer = function(player, platforms, dx, dy) {
+	moveActor(player, dx, dy);
+	platforms.forEach(function(platform) {
+		platform.tileGroup.children.forEach(function(tile) {
+			tile.position.x -= dx;
+			tile.position.y -= dy;
+		});
+	});
 }
 
 damagePlayer = function(player, damage) {
@@ -165,18 +195,4 @@ invlunerablePlayer = function(player) {
 attackPlayer = function(player, attack) {
 	player.weaponbox = player.weaponBoxes[attack];
 	setAnimation(player, player.animations[attack]);
-}
-
-playerStick = function(player, groundBoxes) {
-	if (checkAttackWall(player, groundBoxes)) {
-		player.sprite.loop = false;
-		player.sprite.onComplete = function() {
-			if (collisionList = getCollisions(player.activeWeaponbox, groundBoxes)) {
-				player.controlMode = 'stuck';
-			} else {
-				player.sprite.loop = true;
-				player.sprite.gotoAndPlay(0);
-			}
-		}
-	}
 }

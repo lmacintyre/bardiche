@@ -55,7 +55,7 @@
 
 		// Set initial game state
 		let state = play;
-		let screen = 1;
+		let screen = 0;
 
 		/*
 		 *  setup
@@ -86,7 +86,7 @@
 			backgroundSprite = new Sprite(resources["res/background.png"].texture);
 			backgroundSprite.scale.set(2, 2);
 
-			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 32, 384);
+			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 256, 320);
 
 			activeScreen = {};
 			setActiveScreen(screen);
@@ -177,8 +177,8 @@
 			actor.hitbox.centerX += dx;
 			actor.hitbox.centerY += dy;
 
-			actor.sprite.x += dx;
-			actor.sprite.y += dy;
+			//actor.sprite.x += dx;
+			//actor.sprite.y += dy;
 
 			if (actor.footLine) moveLine(actor.footLine, dx, dy);
 		}
@@ -291,40 +291,23 @@
 			return h;
 		}
 
-		function buildStage(newScreen, enemies, hazards, playerSprite, scenery) {
+		function buildStage(platforms, playerSprite) {
 			
 			let tileTextures = PIXI.loader.resources["res/grasstiles.json"].textures;
 			let stage = new Container()
-
-			groundBoxes = newScreen.groundBoxes;
-			buildScreenBoxes(groundBoxes);
 			
 			stage.addChild(backgroundSprite);
 			stage.addChild(cloudsSprite);
-
-			scenery.forEach(function(item) {
-				let decoration = new Sprite(resources[item.path].texture);
-				decoration.position.set(item.x, item.y);
-				decoration.scale.set(2, 2);
-				stage.addChild(decoration);
-			});
-
-			enemies.forEach(function(enemy) {
-				stage.addChild(enemy.sprite);
-			});
-
-			hazards.forEach(function(hazard) {
-				stage.addChild(hazard.sprite);
-			});
-
 			stage.addChild(playerSprite);
 
-			newScreen.platforms.forEach(function(platform) {
+			platforms.forEach(function(platform) {
 				setPlatformTiles(tileTextures, platform);
 				stage.addChild(platform.tileGroup);
+
+				if (platform.type === 'block') {
+					buildHitbox(platform.hitbox);
+				}
 			});
-			
-			stage.addChild(getSpriteSet(tileTextures, newScreen.tiles));
 			
 			stage.addChild(hitBoxRenderer);
 
@@ -338,88 +321,43 @@
 
 		function setActiveScreen(key) {
 			screen = key;
-			let enemiesSrc = screens[key].enemies;
-			activeScreen.enemies = [];
-			enemiesSrc.forEach(function(enemy) {
-				activeScreen.enemies.push(spawnEnemy(
-					buildEnemy(enemy.name),
-					enemy.position.x,
-					enemy.position.y,
-					enemy.spawnFunction,
-					enemy.deathFunction
-				));
-			});
-
-			
-			let hazardsSrc = screens[key].hazards;
-			activeScreen.hazards = [];
-			hazardsSrc.forEach(function(hazard) {
-				activeScreen.hazards.push(spawnHazard(
-					buildHazard(hazard.name),
-					hazard.position.x,
-					hazard.position.y
-				));
-			});
-
-			activeScreen.stage = buildStage(screens[key], activeScreen.enemies, activeScreen.hazards, 
-				player.sprite, screenDecorations[key]);
-
-			activeScreen.platforms = screens[key].platforms;
+			activeScreen.platforms = level_forest.platformGroups[0].platforms;
+			activeScreen.stage = buildStage(activeScreen.platforms, player.sprite);
 		}
 
 		function play() {
+
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
 			/* CLOUD SCROLL */
 			cloudsSprite.tilePosition.x -= 0.03;
 
-			/* CHANGE SCREENS */
-			if (player.sprite.x < 0) {
-
-				moveActor(player, 512, 0);
-				screen--;
-
-				setActiveScreen(screen);
-			
-			} else if (player.sprite.x > 512) {
-
-				moveActor(player, -512, 0);
-				screen++;
-
-				setActiveScreen(screen);
-			}
-
 			if (player.grounded) player.sprite.vy = 0.1;
 			player.grounded = false;
 
 			/* MOVE ACTORS */
-			moveActor(player, player.sprite.vx, player.sprite.vy);
-
-			activeScreen.enemies.forEach(function(enemy) {
-				enemy.grounded = false;
-				moveActor(enemy, enemy.sprite.vx, enemy.sprite.vy);
-
-				manageEvent(enemy);
-			});
+			movePlayer(player, activeScreen.platforms, player.sprite.vx, player.sprite.vy);
 
 			/* BUILD WEAPON HITBOXES */
 			if (player.weaponbox) {
 				player.activeWeaponbox = buildWeaponbox(player, player.weaponbox[player.sprite.currentFrame]);
 			}
 
-			activeScreen.enemies.forEach(function(enemy) {
-				if (enemy.weaponbox) {
-					enemy.activeWeaponbox = buildWeaponbox(enemy, enemy.weaponbox[enemy.sprite.currentFrame]);
-				}
-			});
-
-			let collision, collisionList;
 			/* GROUND CHECKS */
-			if (!player.keyObjectDown.isDown && player.sprite.vy > 0) {
-				let collision;
-				activeScreen.platforms.forEach(function(platform) {
-					if (collision = linesCross(player.footLine, platform)) {
+			let collision, collisionList;
+			activeScreen.platforms.forEach(function(platform) {
+				collision = 0;
+
+				if (platform.type === 'platform') {
+					if (!player.keyObjectDown.isDown && player.sprite.vy > 0) {
+						collision = linesCross(player.footLine, platform);
+					}
+				} else if (platform.type === 'block') {
+					collision = rectangleCollision(player.hitbox, platform.hitbox);
+				}
+
+				if (collision) {
 						if (platform.tileGroup.children.length > 0) {
 							
 							activeScreen.stage.removeChild(player.sprite);
@@ -428,45 +366,9 @@
 							player.activePlatform = platform;
 						}
 
-						resolveCollision(player, collision);
+						player.resolveCollision(collision);
 					}
-				});
-			}
-
-			if (collisionList = getCollisions(player.hitbox, groundBoxes)) {
-				collisionList.forEach(function(collision) {
-					resolveCollision(player, collision);
-				});
-			}
-
-			activeScreen.enemies.forEach(function(enemy) {
-				if (enemy.colliding) {
-					if (collisionList = getCollisions(enemy.hitbox, groundBoxes)) {
-						collisionList.forEach(function(collision) {
-							resolveCollision(enemy, collision);
-						});
-					}
-				}
-
-				if (!enemy.grounded) enemy.sprite.vy += (0.2 * enemy.weight);
 			});
-
-			/* WEAPON CHECKS */
-			if (player.weaponbox) {
-				playerStick(player, groundBoxes);
-
-				activeScreen.enemies.forEach(function(enemy) {
-					if (collisionList = getCollisions(player.activeWeaponbox, [enemy.hitbox])) {
-						enemy.onhit(player.activeWeaponbox.name, player.sprite.vy);
-
-						if (enemy.active && player.activeWeaponbox.name === 'drill') {
-							player.sprite.vy = -2;
-						}
-					}
-				});
-			}
-
-			activeScreen.enemies.forEach(function(enemy) {enemy.onstep()});
 
 			/* GRAVITY */
 			if (!player.grounded && !player.stuck) {
@@ -475,7 +377,6 @@
 				player.sprite.vy += 0.2 - 0.2 * (player.jumptimer/20);
 
 				if (player.jumptimer > 0) player.jumptimer--;
-
 			}
 
 			/* RENDER HITBOXES */
@@ -485,12 +386,12 @@
 				hitBoxRenderer.lineTo(player.footLine.p2.x, player.footLine.p2.y);
 
 				activeScreen.platforms.forEach(function(platform) {
-					hitBoxRenderer.moveTo(platform.p1.x, platform.p1.y);
-					hitBoxRenderer.lineTo(platform.p2.x, platform.p2.y);
-				});
-
-				groundBoxes.forEach(function(box) {
-					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
+					if (platform.type === 'platform') {
+						hitBoxRenderer.moveTo(platform.p1.x - player.hitbox.centerX + 256, platform.p1.y - player.hitbox.centerY + 320);
+						hitBoxRenderer.lineTo(platform.p2.x - player.hitbox.centerX + 256, platform.p2.y - player.hitbox.centerY + 320);
+					} else if (platform.type === 'block') {
+						drawHitbox(platform.hitbox, hitBoxRenderer);
+					}
 				});
 
 				drawHitbox(player.hitbox, hitBoxRenderer)
@@ -498,29 +399,7 @@
 					let box = player.activeWeaponbox;
 					hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
 				}
-
-				activeScreen.enemies.forEach(function(enemy) {
-					drawHitbox(enemy.hitbox, hitBoxRenderer);
-
-					if (enemy.weaponbox) {
-						let box = enemy.activeWeaponbox;
-						hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
-					}
-				});
 			}
-
-			eventBoxes[screen].forEach(function(box) {
-				if (box.active) {
-					let collision = rectangleCollision(player.hitbox, box);
-					if (!box.playerPresent && collision) {
-						box.onPlayerEnter();
-					} else if (box.playerPresent && collision == undefined) {
-						box.playerPresent = false;
-					}
-
-					if (renderHitboxes) hitBoxRenderer.drawRect(box.x, box.y, box.width, box.height);
-				}
-			});
 
 			/* CONTROL AND ANIMATE PLAYER */
 			controlPlayer();

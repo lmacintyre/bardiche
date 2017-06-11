@@ -60,7 +60,12 @@ buildHitbox = function(hitbox) {
 }
 
 drawHitbox = function(hitbox, renderer) {
-	renderer.drawRect(hitbox.centerX - hitbox.halfWidth, hitbox.centerY - hitbox.halfHeight, hitbox.halfWidth*2, hitbox.halfHeight*2);
+	renderer.drawRect(
+		hitbox.centerX - hitbox.halfWidth - player.hitbox.centerX + 256,
+		hitbox.centerY - hitbox.halfHeight - player.hitbox.centerY + 320,
+		hitbox.halfWidth*2,
+		hitbox.halfHeight*2
+	);
 }
 
 getCollisions = function(hitbox, checkArray) {
