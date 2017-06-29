@@ -39,6 +39,22 @@ level_forest = {
 					'scenerySrc': [
 						{'x': 768, 'y': 0, 'path': 'res/goddess.png'},
 						{'x': 768, 'y': 0, 'path': 'res/marble.png'}
+					],
+
+					'backgroundSrc': []
+				}, {
+					'type': 'platform',
+					'p1': {'x': 1056, 'y': 96},
+					'p2': {'x': 1200, 'y': 96},
+
+					'tilesSrc': [],
+
+					'scenerySrc': [
+						{'x': 768, 'y': -512, 'path':'res/climbtree.png'}
+					],
+
+					'backgroundSrc': [
+						{'x': 768, 'y': -512, 'path':'res/climbtree-bg.png'}
 					]
 				}, {
 					'type': 'platform',
@@ -60,7 +76,26 @@ level_forest = {
 						{'x': 384, 'y': 0, id:tileEnum.CRN_OTR}
 					],
 
-					'scenerySrc': []
+					'scenerySrc': [],
+					'backgroundSrc': []
+				}, {
+					'type': 'platform',
+					'p1': {'x': 1216, 'y': 320},
+					'p2': {'x': 1600, 'y': 320},
+
+					'tilesSrc': [
+						{'x': 1152, 'y': 256, id:tileEnum.CRN_OTL},
+						{'x': 1280, 'y': 256, id:tileEnum.STR_BOT},
+						{'x': 1408, 'y': 256, id:tileEnum.STR_BOT},
+						{'x': 1536, 'y': 256, id:tileEnum.CRN_OTR},
+						{'x': 1152, 'y': 384, id:tileEnum.STR_RIG},
+						{'x': 1280, 'y': 384, id:tileEnum.FIL_DRT},
+						{'x': 1408, 'y': 384, id:tileEnum.FIL_DRT},
+						{'x': 1536, 'y': 384, id:tileEnum.STR_LEF},
+					],
+
+					'scenerySrc': [],
+					'backgroundSrc': []
 				}, {
 					'type': 'block',
 					'hitbox': {
@@ -78,7 +113,27 @@ level_forest = {
 						{'x': 384, 'y': 512, id:tileEnum.FIL_DRT}
 					],
 
-					'scenerySrc': []
+					'scenerySrc': [],
+					'backgroundSrc': []
+				}, {
+					'type': 'block',
+					'hitbox': {
+						'x': -512, 'y': 448, 'width': 512, 'height': 64
+					},
+
+					'tilesSrc': [
+						{'x': -512, 'y': 384, id:tileEnum.STR_BOT},
+						{'x': -384, 'y': 384, id:tileEnum.STR_BOT},
+						{'x': -256, 'y': 384, id:tileEnum.STR_BOT},
+						{'x': -128, 'y': 384, id:tileEnum.STR_BOT},
+						{'x': -512, 'y': 512, id:tileEnum.FIL_DRT},
+						{'x': -384, 'y': 512, id:tileEnum.FIL_DRT},
+						{'x': -256, 'y': 512, id:tileEnum.FIL_DRT},
+						{'x': -128, 'y': 512, id:tileEnum.FIL_DRT}
+					],
+
+					'scenerySrc': [],
+					'backgroundSrc': []
 				}, {
 					'type': 'block',
 					'hitbox': {
@@ -97,7 +152,8 @@ level_forest = {
 						{'x': 768, 'y': 512, id:tileEnum.FIL_DRT}
 					],
 
-					'scenerySrc': []
+					'scenerySrc': [],
+					'backgroundSrc': []
 				}, {
 					'type': 'block',
 					'hitbox': {
@@ -115,15 +171,40 @@ level_forest = {
 						{'x': 1216, 'y': 512, id:tileEnum.FIL_DRT}
 					],
 
-					'scenerySrc': []
+					'scenerySrc': [],
+					'backgroundSrc': []
 				}
 			]
 		}
+	],
+
+	'scenery': [
+		{'x': -512, 'y': 0, 'path':'res/bigtree.png'}
+	],
+
+	'background': [
+		{'path': 'res/mountainscroll-1.png', 'scrollRate': 0.1},
+		{'path': 'res/mountainscroll-2.png', 'scrollRate': 0.2}
+	],
+
+	'enemies': [
+		{'base': enemy_skeleton, 'x': 0, 'y': 256},
+		{'base': enemy_skeleton, 'x': 32, 'y': 256},
+		{'base': enemy_skeleton, 'x': 64, 'y': 256}
 	]
 }
 
 let setPlatformTiles = function(tileset, platform) {
+	let backgroundGroup = new Container();
 	let tileGroup = new Container();
+
+	platform.backgroundSrc.forEach(function(scenery) {
+		let newSprite = new Sprite(resources[scenery.path].texture);
+
+		newSprite.position.set(scenery.x, scenery.y);
+		newSprite.scale.set(2, 2);
+		backgroundGroup.addChild(newSprite);
+	});
 
 	platform.scenerySrc.forEach(function(scenery) {
 		let newSprite = new Sprite(resources[scenery.path].texture);
@@ -142,4 +223,5 @@ let setPlatformTiles = function(tileset, platform) {
 	});
 
 	platform.tileGroup = tileGroup;
+	platform.backgroundGroup = backgroundGroup;
 }

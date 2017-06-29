@@ -46,16 +46,20 @@
 		// Load spritesheets
 		loader.add('res/grasstiles.json')
 			.add('res/playerdata.json')
+			.add('res/skeleton-data.json')
 			.add('res/bigtree.png')
+			.add('res/climbtree.png')
+			.add('res/climbtree-bg.png')
 			.add('res/goddess.png')
-			.add('res/background.png')
 			.add('res/cloudscroll.png')
 			.add('res/marble.png')
+			.add('res/mountainscroll-1.png')
+			.add('res/mountainscroll-2.png')
+			.add('res/treescroll.png')
 			.load(setup);
 
 		// Set initial game state
 		let state = play;
-		let screen = 0;
 
 		/*
 		 *  setup
@@ -69,10 +73,9 @@
 		let keyObjectLeft, keyObjectRight, keyObjectZ, keyObjectX;
 		let groundBoxes, hitBoxRenderer;
 		let renderHitboxes;
-		let backgroundSprite;
-		let cloudsSprite;
+		let cloudsSprite, cloudsSprite2;
 		function setup() {
-			
+
 			let tileTextures = PIXI.loader.resources["res/grasstiles.json"].textures;
 			let playerTextures = PIXI.loader.resources["res/playerdata.json"].textures;
 
@@ -80,16 +83,18 @@
 			cloudsSprite.scale.set(2, 2);
 			cloudsSprite.position.set(0, 0);
 
+			cloudsSprite2 = new PIXI.extras.TilingSprite(resources['res/cloudscroll.png'].texture, 256, 256);
+			cloudsSprite2.scale.set(2, 2);
+			cloudsSprite2.position.set(0, -128);
+			cloudsSprite2.tilePosition.set(256, 0);
+
 			hitBoxRenderer = new PIXI.Graphics();
 			renderHitboxes = true;
-
-			backgroundSprite = new Sprite(resources["res/background.png"].texture);
-			backgroundSprite.scale.set(2, 2);
 
 			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 256, 320);
 
 			activeScreen = {};
-			setActiveScreen(screen);
+			setActiveScreen(level_forest);
 			renderer.render(activeScreen.stage); 
 
 			keyObjectLeft = keyboard(37);
@@ -137,7 +142,10 @@
 			keyObjectX.press = function() {
 				if (player.controlMode === 'free') {
 					if (player.grounded) attackPlayer(player, 'slash');
-					else attackPlayer(player, 'drill');
+					else {
+						attackPlayer(player, 'drill');
+						player.sprite.vy = 8;
+					}
 				}
 			}
 			keyObjectX.release = function() {
@@ -173,107 +181,16 @@
 			actor.sprite.loop = loop;
 		}
 
-		moveActor = function(actor, dx, dy) {
+		moveActor = function(actor, dx, dy, isFocus=false) {
 			actor.hitbox.centerX += dx;
 			actor.hitbox.centerY += dy;
 
-			//actor.sprite.x += dx;
-			//actor.sprite.y += dy;
+			if (!isFocus) {
+				actor.sprite.x += dx;
+				actor.sprite.y += dy;
+			}
 
 			if (actor.footLine) moveLine(actor.footLine, dx, dy);
-		}
-
-		animatePlayer = function() {
-			if (player.controlMode === 'free') {
-				if (player.weaponbox) {
-
-				} else {
-					if (player.grounded) {
-						if (player.sprite.vx === 0) setAnimation(player, player.animations.idle);
-						else setAnimation(player, player.animations.walk);
-					} else {
-						setAnimation(player, player.animations.jump);
-					}
-				}
-			} else if (player.controlMode === 'hit') {
-				setAnimation(player, player.animations.damage);
-			}
-		}
-
-		turnPlayer = function() {
-			if (keyObjectLeft.isDown) {
-				player.sprite.scale.x = -1;
-
-			} else if (keyObjectRight.isDown) {
-				player.sprite.scale.x = 1;
-			}
-		}
-
-		walkPlayer = function() {
-			if (keyObjectRight.isDown || keyObjectLeft.isDown) {
-				//either left or right is pressed
-
-				if (!keyObjectLeft.isDown) {
-					//only right pressed
-					player.sprite.vx = 3;
-					
-				} else if (!keyObjectRight.isDown) {
-					//only left pressed
-					player.sprite.vx = -3;
-					
-				} else {
-					// Left and right pressed
-					player.sprite.vx = 0;
-
-				}
-			} else {
-				//neither left nor right pressed
-				player.sprite.vx = 0;
-			}
-		}
-
-		controlPlayer = function() {
-			if (player.controlMode === 'free') {
-				if (player.grounded && player.weaponbox) {
-					player.sprite.vx = 0;
-
-				} else {
-					walkPlayer();
-				}
-
-				turnPlayer();
-
-			} else if (player.controlMode === 'hit') {
-
-				if (player.grounded) {
-					player.sprite.vx = 0;
-					player.controlMode = 'free';
-					setAnimation(player, player.animations.idle);
-				}
-
-				if (player.damageTimer < now - 1000) {
-					player.controlMode = 'free';
-					setAnimation(player, player.animations.idle);
-				}
-			} else if (player.controlMode === 'stuck') {
-				player.sprite.vx = 0;
-				player.sprite.vy = 0;
-
-			} else if (player.controlMode === 'attack') {
-				if (!player.grounded) {
-					walkPlayer();
-				}
-				if (!keyObjectX.isDown && !keyObjectZ.isDown) {
-					player.weaponbox = 0;
-					player.controlMode = 'free';
-				}
-
-				turnPlayer();
-			}
-
-			if (player.vulnerable === false && player.invulnTimer < now - 1000) {
-				player.vulnerable = true;
-			}
 		}
 
 		buildWeaponbox = function(actor, weaponboxBase) {
@@ -291,17 +208,41 @@
 			return h;
 		}
 
-		function buildStage(platforms, playerSprite) {
+		function buildStage(level, playerSprite) {
 			
 			let tileTextures = PIXI.loader.resources["res/grasstiles.json"].textures;
 			let stage = new Container()
-			
-			stage.addChild(backgroundSprite);
+
 			stage.addChild(cloudsSprite);
+			stage.addChild(cloudsSprite2);
+
+			level.background.forEach(function(item) {
+				let scrollSprite = new PIXI.extras.TilingSprite(resources[item.path].texture, 256, 256);
+				scrollSprite.scrollRate = item.scrollRate;
+				scrollSprite.scale.set(2, 2);
+				stage.addChild(scrollSprite);
+				activeScreen.background.push(scrollSprite);
+			});
+
+			level.scenery.forEach(function(item) {
+				let newSprite = new Sprite(resources[item.path].texture);
+				newSprite.position.set(item.x, item.y);
+				newSprite.scale.set(2, 2);
+				stage.addChild(newSprite);
+				activeScreen.scenery.push(newSprite);
+			});
+
+			level.enemies.forEach(function(enemy) {
+				let newEnemy = spawnEnemy(buildEnemy(enemy.base), enemy.x, enemy.y);
+				activeScreen.enemies.push(newEnemy);
+				stage.addChild(newEnemy.sprite);
+			});
+			
 			stage.addChild(playerSprite);
 
-			platforms.forEach(function(platform) {
+			level.platformGroups[0].platforms.forEach(function(platform) {
 				setPlatformTiles(tileTextures, platform);
+				stage.addChild(platform.backgroundGroup);
 				stage.addChild(platform.tileGroup);
 
 				if (platform.type === 'block') {
@@ -311,18 +252,19 @@
 			
 			stage.addChild(hitBoxRenderer);
 
+			let testText = new PIXI.Text('this is some example text!', {fontFamily: 'Arial', fontSize: 24, fill: 0x330011, align: 'center'
+				, wordWrap: true, wordWrapWidth: 256});
+			stage.addChild(testText)
+ 
 			return stage;
 		}
 
-		function checkAttackWall(actor, groundBoxes) {
-			if (collisionList = getCollisions(actor.activeWeaponbox, groundBoxes)) return true;
-			return false;
-		}
-
-		function setActiveScreen(key) {
-			screen = key;
-			activeScreen.platforms = level_forest.platformGroups[0].platforms;
-			activeScreen.stage = buildStage(activeScreen.platforms, player.sprite);
+		function setActiveScreen(level) {
+			activeScreen.platforms = level.platformGroups[0].platforms;
+			activeScreen.background = [];
+			activeScreen.scenery = [];
+			activeScreen.enemies = [];
+			activeScreen.stage = buildStage(level, player.sprite);
 		}
 
 		function play() {
@@ -331,14 +273,18 @@
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
 
 			/* CLOUD SCROLL */
-			cloudsSprite.tilePosition.x -= 0.03;
+			cloudsSprite.tilePosition.x -= 0.01;
+			cloudsSprite2.tilePosition.x -= 0.05;
 
 			if (player.grounded) player.sprite.vy = 0.1;
 			player.grounded = false;
 
 			/* MOVE ACTORS */
-			movePlayer(player, activeScreen.platforms, player.sprite.vx, player.sprite.vy);
-
+			movePlayer(player, player.sprite.vx, player.sprite.vy);
+			activeScreen.enemies.forEach(function(enemy) {
+				moveActor(enemy, enemy.sprite.vx, enemy.sprite.vy);
+				enemy.onstep();
+			});
 			/* BUILD WEAPON HITBOXES */
 			if (player.weaponbox) {
 				player.activeWeaponbox = buildWeaponbox(player, player.weaponbox[player.sprite.currentFrame]);
@@ -368,16 +314,43 @@
 
 						player.resolveCollision(collision);
 					}
+
+				activeScreen.enemies.forEach(function(enemy) {
+					collision = 0;
+
+					if (platform.type === 'platform') {
+						collision = linesCross(enemy.footLine, platform);
+					} else if (platform.type === 'block') {
+						collision = rectangleCollision(enemy.hitbox, platform.hitbox);
+					}
+
+					if (collision) {
+							if (platform.tileGroup.children.length > 0) {
+								
+								activeScreen.stage.removeChild(enemy.sprite);
+								activeScreen.stage.addChildAt(enemy.sprite, activeScreen.stage.getChildIndex(platform.tileGroup));
+
+								enemy.activePlatform = platform;
+							}
+
+							enemy.resolveCollision(collision);
+						}
+				})
 			});
 
 			/* GRAVITY */
 			if (!player.grounded && !player.stuck) {
 				let t = player.jumptimer;
 
-				player.sprite.vy += 0.2 - 0.2 * (player.jumptimer/20);
+				if (player.sprite.vy < player.terminalVelocity) player.sprite.vy += 0.2 - 0.2 * (player.jumptimer/20);
 
 				if (player.jumptimer > 0) player.jumptimer--;
 			}
+
+
+			activeScreen.enemies.forEach(function(enemy) {
+				if (!enemy.grounded) enemy.sprite.vy += 0.2;
+			});
 
 			/* RENDER HITBOXES */
 			if (renderHitboxes) {
@@ -392,6 +365,10 @@
 					} else if (platform.type === 'block') {
 						drawHitbox(platform.hitbox, hitBoxRenderer);
 					}
+				});
+
+				activeScreen.enemies.forEach(function(enemy) {
+					drawHitbox(enemy.hitbox, hitBoxRenderer)
 				});
 
 				drawHitbox(player.hitbox, hitBoxRenderer)

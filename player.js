@@ -8,6 +8,7 @@ playerBase_pinkKnight = {
 	},
 
 	jumptimer: 20,
+	terminalVelocity: 12,
 
 	weaponBoxes: {
 		stab: [{
@@ -100,6 +101,7 @@ spawnPlayer = function(playerBase, x, y) {
 
 		jumptimer: playerBase.jumptimer,
 		maxjumptimer: playerBase.jumptimer,
+		terminalVelocity: playerBase.terminalVelocity,
 
 		controlMode: 'free',
 
@@ -108,17 +110,17 @@ spawnPlayer = function(playerBase, x, y) {
 			let side = collision.side, overlap = collision.overlap;
 
 			if (side == "top") {
-				movePlayer(this, activeScreen.platforms, 0, overlap);
+				movePlayer(this, 0, overlap);
 
 			} else if (side == "bottom") {
-				movePlayer(this, activeScreen.platforms, 0, overlap * -1);
+				movePlayer(this, 0, overlap * -1);
 				this.grounded = true;
 
 			} else if (side == "left") {
-				movePlayer(this, activeScreen.platforms, overlap, 0);
+				movePlayer(this, overlap, 0);
 
 			} else if (side == "right") {
-				movePlayer(this, activeScreen.platforms, overlap * -1, 0);
+				movePlayer(this, overlap * -1, 0);
 			}
 		}
 	}
@@ -154,12 +156,15 @@ spawnPlayer = function(playerBase, x, y) {
 	spawn.keyObjectDown.press = function() {
 		if (player.activePlatform) {
 			if (player.activePlatform.type === 'platform') {
-				console.log('drop it')
 				activeScreen.stage.removeChild(player.sprite);
 				activeScreen.stage.addChildAt(player.sprite, activeScreen.stage.getChildIndex(player.activePlatform.tileGroup) + 1);
 
-				player.activePlatform = undefined;
+				player.activePlatform = 0;
 			}
+		} 
+
+		if (!player.grounded) {
+			player.sprite.vy = 8;
 		}
 	}
 
@@ -167,13 +172,35 @@ spawnPlayer = function(playerBase, x, y) {
 	return spawn;
 }
 
-movePlayer = function(player, platforms, dx, dy) {
-	moveActor(player, dx, dy);
-	platforms.forEach(function(platform) {
+movePlayer = function(player, dx, dy) {
+	moveActor(player, dx, dy, true);
+
+	activeScreen.platforms.forEach(function(platform) {
+
 		platform.tileGroup.children.forEach(function(tile) {
 			tile.position.x -= dx;
 			tile.position.y -= dy;
 		});
+
+		platform.backgroundGroup.children.forEach(function(tile) {
+			tile.position.x -= dx;
+			tile.position.y -= dy;
+		});
+	});
+
+	activeScreen.background.forEach(function(item) {
+		item.tilePosition.x -= dx * item.scrollRate;
+		item.position.y -= dy * item.scrollRate;
+	});
+
+	activeScreen.scenery.forEach(function(item) {
+		item.position.x -= dx;
+		item.position.y -= dy;
+	});
+
+	activeScreen.enemies.forEach(function(item) {
+		item.sprite.position.x -= dx;
+		item.sprite.position.y -= dy;
 	});
 }
 
@@ -195,4 +222,97 @@ invlunerablePlayer = function(player) {
 attackPlayer = function(player, attack) {
 	player.weaponbox = player.weaponBoxes[attack];
 	setAnimation(player, player.animations[attack]);
+}
+
+animatePlayer = function() {
+	if (player.controlMode === 'free') {
+		if (player.weaponbox) {
+
+		} else {
+			if (player.grounded) {
+				if (player.sprite.vx === 0) setAnimation(player, player.animations.idle);
+				else setAnimation(player, player.animations.walk);
+			} else {
+				setAnimation(player, player.animations.jump);
+			}
+		}
+	} else if (player.controlMode === 'hit') {
+		setAnimation(player, player.animations.damage);
+	}
+}
+
+turnPlayer = function() {
+	if (keyObjectLeft.isDown) {
+		player.sprite.scale.x = -1;
+
+	} else if (keyObjectRight.isDown) {
+		player.sprite.scale.x = 1;
+	}
+}
+
+walkPlayer = function() {
+	if (keyObjectRight.isDown || keyObjectLeft.isDown) {
+		//either left or right is pressed
+
+		if (!keyObjectLeft.isDown) {
+			//only right pressed
+			player.sprite.vx = 3;
+			
+		} else if (!keyObjectRight.isDown) {
+			//only left pressed
+			player.sprite.vx = -3;
+			
+		} else {
+			// Left and right pressed
+			player.sprite.vx = 0;
+
+		}
+	} else {
+		//neither left nor right pressed
+		player.sprite.vx = 0;
+	}
+}
+
+controlPlayer = function() {
+	if (player.controlMode === 'free') {
+		if (player.grounded && player.weaponbox) {
+			player.sprite.vx = 0;
+
+		} else {
+			walkPlayer();
+		}
+
+		turnPlayer();
+
+	} else if (player.controlMode === 'hit') {
+
+		if (player.grounded) {
+			player.sprite.vx = 0;
+			player.controlMode = 'free';
+			setAnimation(player, player.animations.idle);
+		}
+
+		if (player.damageTimer < now - 1000) {
+			player.controlMode = 'free';
+			setAnimation(player, player.animations.idle);
+		}
+	} else if (player.controlMode === 'stuck') {
+		player.sprite.vx = 0;
+		player.sprite.vy = 0;
+
+	} else if (player.controlMode === 'attack') {
+		if (!player.grounded) {
+			walkPlayer();
+		}
+		if (!keyObjectX.isDown && !keyObjectZ.isDown) {
+			player.weaponbox = 0;
+			player.controlMode = 'free';
+		}
+
+		turnPlayer();
+	}
+
+	if (player.vulnerable === false && player.invulnTimer < now - 1000) {
+		player.vulnerable = true;
+	}
 }

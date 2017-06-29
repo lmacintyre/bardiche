@@ -1,103 +1,16 @@
-hazard_wax = {
-	name: 'hot wax',
-	sheet: 'hotwax.json',
+enemy_skeleton = {
+	name: 'skeleton',
+	sheet: 'skeleton-data.json',
+
+	hitpoints: 30,
 
 	hitbox: {
-		width: 64,
-		height: 64
-	},
-
-	frameIds: {
-		active: ['hotwax-1', 'hotwax-2']
-	},
-
-	animations: {
-		// populated by buildHazard
-	}
-}
-
-buildHazard = function(hazardBase) {
-	Object.keys(hazardBase.frameIds).forEach(function(key) {
-		hazardBase.animations[key] = [];
-		hazardBase.frameIds[key].forEach(function(frame) {
-			hazardBase.animations[key].push(PIXI.Texture.fromFrame(frame));
-		});
-	});
-
-	return hazardBase;
-}
-
-spawnHazard = function(hazard, x, y) {
-	hazard.hitbox.x = x - hazard.hitbox.width/2;
-	hazard.hitbox.y = y - hazard.hitbox.height/2;
-	buildHitbox(hazard.hitbox);
-	let spawnHitbox = cloneHitbox(hazard.hitbox);
-	
-	
-
-	spawn = {
-		name: hazard.name,
-
-		hitbox: spawnHitbox,
-		weaponBoxes: hazard.weaponBoxes,
-		animations: hazard.animations,
-	};
-
-	spawn.sprite = new PIXI.extras.AnimatedSprite(spawn.animations.active);
-	spawn.sprite.animationSpeed = 0.1;
-
-	spawn.sprite.position.set(x, y);
-	spawn.sprite.anchor.set(0.5, 0.5);
-
-	spawn.sprite.play();
-	return spawn;
-}
-
-enemy_tiamat = {
-	name: 'tiamat',
-	sheet: 'waxtiamat.json',
-
-	hitpoints: 500,
-
-	hitbox: {
-		width: 10,
-		height: 10
+		width: 24,
+		height: 110
 	},
 
 	weaponBoxes: {
-
-	},
-
-	weight: 0,
-
-	frameIds: {
-		idle: ['tiamat-idle'],
-		light: ['tiamat-wake-1', 'tiamat-wake-2', 'tiamat-wake-3', 'tiamat-wake-4'],
-		sleep: ['tiamat-sleep']
-	},
-
-	animations: {
-		// populated by buildEnemy
-	},
-
-	onhit() {},
-
-	onstep() {}
-}
-
-enemy_nuttboy = {
-	name: 'nuttboy',
-	sheet: 'nuttboydata.json',
-
-	hitpoints: 3,
-
-	hitbox: {
-		width: 64,
-		height: 64
-	},
-
-	weaponBoxes: {
-		attack1: [{
+		stab: [{
 			name: 'stab',
 			offsetX: 44, offsetY: -4,
 			width: 20, height: 14
@@ -105,127 +18,47 @@ enemy_nuttboy = {
 			name: 'stab',
 			offsetX: 48, offsetY: -4,
 			width: 20, height: 14
-		}],
-
-		attack2: [{
-			name:'spikes',
-			offsetX: -32, offsetY: -32,
-			width: 64, height: 0
-		}, {
-			name:'spikes',
-			offsetX: -32, offsetY: -42,
-			width: 64, height: 32
-		}, {
-			name:'spikes',
-			offsetX: -32, offsetY: -52,
-			width: 64, height: 42
-		}, {
-			name:'spikes',
-			offsetX: -32, offsetY: -52,
-			width: 64, height: 42
-		}, {
-			name:'spikes',
-			offsetX: -32, offsetY: -42,
-			width: 64, height: 32
-		}, {
-			name:'spikes',
-			offsetX: -32, offsetY: -32,
-			width: 64, height: 0
 		}]
 	},
 
-	weight: 1,
+	weight: 0.5,
 
 	frameIds: {
-		idle: ['nuttboy-walk-1', 'nuttboy-walk-1'],
-		walk: ['nuttboy-walk-1', 'nuttboy-walk-2'],
-		stuck: ['nuttboy-stuck-1', 'nuttboy-stuck-2'],
-		attack1: ['nuttboy-stab-1', 'nuttboy-stab-2'],
-		attack2: ['nuttboy-spikes-1', 'nuttboy-spikes-2', 'nuttboy-spikes-3',
-				  'nuttboy-spikes-3', 'nuttboy-spikes-2', 'nuttboy-spikes-1'],
-		death: ['nuttboy-death-1', 'nuttboy-death-2', 'nuttboy-death-3',
-				'nuttboy-death-4', 'nuttboy-death-5']
+		idle: ['skeleton-walk-1'],
+		walk: ['skeleton-walk-1', 'skeleton-walk-2'],
+		stab: ['skeleton-stab-1', 'skeleton-stab-2']
 	},
 
 	animations: {
-		// populated by buildEnemy
+
 	},
 
-	onhit(attack, damage) {
-		if (attack === 'drill') {
-			console.log("drilling")
-			if (this.vulnerable) {
-				this.vulnerable = false;
-
-				this.sprite.vx = 0;
-				setAnimation(this, this.animations.walk, true);
-				pushEvent(this, {
-					run(enemy) {
-						nuttboySpikes(enemy);
-						enemy.sprite.onComplete = function() {
-							enemy.vulnerable = true;
-
-							nuttboyCharge(enemy, player);
-						}
-					},
-
-					delay: 250
-				});
-
-				if (damage > 3) {
-					this.hitpoints -= damage;
-					console.log(this.hitpoints)
-					if (this.hitpoints <= 0) {
-						console.log('die')
-						nuttboyDie(this);
-					}
-				}
-			}
-		}
-	},
+	onhit() {},
 
 	onstep() {
-		if (this.weaponbox) {
-			if (this.activeWeaponbox.name === 'stab') {
-				if (checkAttackWall(this, groundBoxes)) {
-					nuttboyStick(this); 
-				}
+		if (this.grounded) this.sprite.vy = 0.1;
+		this.grounded = false;
 
-				if (player.vulnerable) {
-					if (collisionList = getCollisions(this.activeWeaponbox, [player.hitbox])) {
-						this.sprite.vx = 0;
-						damagePlayer(player, 1);
-						player.sprite.vx = this.sprite.scale.x * 5;
-						player.sprite.vy = -3;
+		if (this.eventQueue.length === 0) {
+			pushEvent(this, {
+				run(enemy) {
+					if (Math.random() > 0.5) walkEnemy(enemy, 2);
+					else walkEnemy(enemy, -2);
+				},
 
-						this.eventQueue = [];
-						pushEvent(this, {
-							run(enemy) {
-								nuttboyCharge(enemy, player);
-							},
+				delay: 700
+			})
 
-							delay: 1000
-						});
-					}
-				}
-			} else if (enemy.activeWeaponbox.name === 'spikes') {
-				if (player.vulnerable) {
-					if (collisionList = getCollisions(this.activeWeaponbox, [player.hitbox])) {
-						damagePlayer(player, 1);
-						player.sprite.vy = -4;
+			pushEvent(this, {
+				run(enemy) {
+					walkEnemy(enemy, 0)
+				},
 
-						this.eventQueue = [];
-						pushEvent(this, {
-							run(enemy) {
-								nuttboyCharge(enemy, player);
-							},
-
-							delay: 1000
-						});
-					}
-				}
-			}
+				delay: 700
+			})
 		}
+
+		manageEvent(this);
 	}
 }
 
@@ -252,7 +85,6 @@ buildEnemy = function(enemy) {
 */
 
 spawnEnemy = function(enemy, x, y, spawnFunction=(e)=>{}, deathFunction=(e)=>{}, facing="left") {
-
 	enemy.hitbox.x = x - enemy.hitbox.width/2;
 	enemy.hitbox.y = y - enemy.hitbox.height/2;
 	buildHitbox(enemy.hitbox);
@@ -263,21 +95,41 @@ spawnEnemy = function(enemy, x, y, spawnFunction=(e)=>{}, deathFunction=(e)=>{},
 		hitpoints: enemy.hitpoints,
 
 		hitbox: spawnHitbox,
+		footLine: {
+			p1: {x: x, y: y + 45},
+			p2: {x: x, y: y + 55}
+		},
 		weaponBoxes: enemy.weaponBoxes,
 		weaponbox: 0,
 		animations: enemy.animations,
 
 		eventQueue: [],
 
+		resolveCollision(collision) {
+
+			let side = collision.side, overlap = collision.overlap;
+
+			if (side == "top") {
+				moveActor(this, 0, overlap);
+
+			} else if (side == "bottom") {
+				moveActor(this, 0, overlap * -1);
+				this.grounded = true;
+
+			} else if (side == "left") {
+				moveActor(this, overlap, 0);
+
+			} else if (side == "right") {
+				moveActor(this, overlap * -1, 0);
+			}
+		},
+
 		onhit: enemy.onhit,
 		onstep: enemy.onstep,
 		ondeath: deathFunction
 	};
 
-	console.log("DF");
-	console.log(spawn.ondeath);
-
-	spawn.activeAnimation = spawn.animations.idle;
+	spawn.activeAnimation = spawn.animations.stab;
 	spawn.sprite = new PIXI.extras.AnimatedSprite(spawn.activeAnimation);
 	spawn.sprite.animationSpeed = 0.1;
 
@@ -308,12 +160,22 @@ jumpEnemy = function(enemy, vy) {
 }
 
 walkEnemy = function(enemy, vx) {
+	
 	enemy.sprite.vx = vx;
-	enemy.activeAnimation = enemy.animations.walk;
-	enemy.sprite.textures = enemy.animations.walk;
 
-	if (vx < 0) enemy.sprite.scale.x = -1;
-	else if (vx > 0) enemy.sprite.scale.x = 1;
+	if (vx !== 0) {
+		enemy.activeAnimation = enemy.animations.walk;
+		enemy.sprite.textures = enemy.animations.walk;
+		enemy.sprite.gotoAndPlay(0);
+
+		if (vx < 0) enemy.sprite.scale.x = -1;
+		else if (vx > 0) enemy.sprite.scale.x = 1;
+	} else {
+		enemy.activeAnimation = enemy.animations.idle;
+		enemy.sprite.textures = enemy.animations.idle;
+
+		enemy.sprite.gotoAndPlay(0);
+	}
 }
 
 pushEvent = function(enemy, event) {
@@ -331,62 +193,4 @@ manageEvent = function(enemy) {
 			enemy.eventStart = now;
 		}
 	}
-}
-
-nuttboyCharge = function(enemy, player) {
-	setAnimation(enemy, enemy.animations.attack1);
-	enemy.weaponbox = enemy.weaponBoxes.attack1;
-
-	if (enemy.sprite.x < player.sprite.x) {
-		enemy.sprite.scale.x = 1;
-	} else {
-		enemy.sprite.scale.x = -1;
-	}
-
-	enemy.sprite.vx = 4 * enemy.sprite.scale.x;
-}
-
-nuttboySpikes = function(enemy) {
-	setAnimation(enemy, enemy.animations.attack2, false);
-	enemy.weaponbox = enemy.weaponBoxes.attack2;
-
-	enemy.sprite.vx = 0;
-}
-
-nuttboyDie = function(enemy) {
-	console.log(enemy)
-	setAnimation(enemy, enemy.animations.death, false);
-	enemy.sprite.onComplete = function() {};
-	enemy.weaponbox = 0;
-	enemy.eventQueue = [];
-	enemy.sprite.vx = 0;
-	enemy.sprite.vy = 0;
-	enemy.active = false;
-
-	enemy.ondeath(enemy);
-}
-
-nuttboyStick = function(enemy) {
-	setAnimation(enemy, enemy.animations.stuck);
-	enemy.weaponbox = 0;
-
-	pushEvent(enemy, {
-		run(enemy) {
-			setAnimation(enemy, enemy.animations.stuck, true);
-			enemy.sprite.vx = 0;
-		},
-
-		delay: 50
-	});
-
-	pushEvent(enemy, {
-		run(enemy) {
-			nuttboySpikes(enemy);
-			enemy.sprite.onComplete = function() {
-				nuttboyCharge(enemy, player);
-			}
-		},
-
-		delay: 1000
-	});
 }
