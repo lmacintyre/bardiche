@@ -138,6 +138,8 @@ spawnPlayer = function(playerBase, x, y) {
 
 	spawn.activePlatform = undefined;
 
+	spawn.speechSprite = 0;
+
 	spawn.keyObjectUp = keyboard(38);
 	spawn.keyObjectUp.press = function() {
 		if (player.controlMode === 'stuck' || player.grounded) {

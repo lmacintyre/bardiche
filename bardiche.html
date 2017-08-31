@@ -92,6 +92,7 @@
 			renderHitboxes = true;
 
 			player = spawnPlayer(buildPlayer(playerBase_pinkKnight), 256, 320);
+			console.log(player)
 
 			activeScreen = {};
 			setActiveScreen(level_forest);
@@ -193,6 +194,16 @@
 			if (actor.footLine) moveLine(actor.footLine, dx, dy);
 		}
 
+		speakActor = function(actor, string) {
+			if (player.speechSprite === 0) {
+				console.log("MARK")
+				let speechText = new PIXI.Text(string, {fontFamily: 'Arial', fontSize: 24, fill: 0x330011, align: 'center', wordWrap: true, wordWrapWidth: 256});
+				player.speechSprite = speechText;
+				speechText.position.set(actor.sprite.position.x + 64, actor.sprite.position.y - 128);
+				activeScreen.stage.addChild(speechText);
+			}
+		}
+
 		buildWeaponbox = function(actor, weaponboxBase) {
 			let h = {
 				name: weaponboxBase.name,
@@ -254,7 +265,7 @@
 
 			let testText = new PIXI.Text('this is some example text!', {fontFamily: 'Arial', fontSize: 24, fill: 0x330011, align: 'center'
 				, wordWrap: true, wordWrapWidth: 256});
-			stage.addChild(testText)
+			//stage.addChild(testText)
  
 			return stage;
 		}
@@ -268,6 +279,8 @@
 		}
 
 		function play() {
+
+			speakActor(player, 'yo!');
 
 			hitBoxRenderer.clear();
 			hitBoxRenderer.lineStyle(1, 0xFF0000);
